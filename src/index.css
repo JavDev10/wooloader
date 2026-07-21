@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+/*
+ * Semantic, theme-aware tokens. Utilities (bg-app, text-fg, border-line, …)
+ * compile to `var(--color-*)`, so overriding a variable under
+ * `:root[data-theme="light"]` re-themes the whole UI. Defaults below are the
+ * dark theme; the light block overrides them. The active theme is set on
+ * <html data-theme> by an inline script in index.html (see src/lib/theme.ts).
+ * Roles:
+ *   app       page background
+ *   surface   cards, inputs, panels
+ *   elevated  hover states, chips
+ *   fg        primary text        muted  secondary text     faint  tertiary
+ *   line      borders
+ *   accent    green CTA/highlight  on-accent  text on accent  accent-ink  green as text
+ *   link      links / focus ring
+ */
+@theme {
+  --color-app: #0f1115;
+  --color-surface: #181b21;
+  --color-elevated: #22262e;
+  --color-fg: #f3f4f6;
+  --color-muted: #9aa3af;
+  --color-faint: #6b7280;
+  --color-line: #2b303b;
+  --color-accent: #a3e635;
+  --color-accent-ink: #a3e635;
+  --color-on-accent: #12160c;
+  --color-link: #38bdf8;
+
+  --font-display: 'Poppins', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+:root[data-theme='light'] {
+  --color-app: #ffffff;
+  --color-surface: #f5f6f8;
+  --color-elevated: #eaecf0;
+  --color-fg: #14171f;
+  --color-muted: #52596b;
+  --color-faint: #8b91a1;
+  --color-line: #e3e6eb;
+  --color-accent: #a3e635;
+  --color-accent-ink: #4d7c0f;
+  --color-on-accent: #14180f;
+  --color-link: #0284c7;
+}
+
+body {
+  @apply bg-app font-body text-fg antialiased;
+}

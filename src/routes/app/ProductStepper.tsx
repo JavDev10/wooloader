@@ -1,0 +1,136 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { useLoadedProducts } from '@/hooks/useLoadedProducts'
+import { useAutosave } from '@/hooks/useAutosave'
+import { useEditorStore } from '@/store/editorStore'
+import { MAX_PRODUCTS_PER_CATALOG } from '@/lib/config'
+import type { AppContext } from '@/routes/app/RequireAuth'
+import type { Product } from '@/lib/types'
+import BasicInfoStep from '@/routes/app/steps/BasicInfoStep'
+import PricingStep from '@/routes/app/steps/PricingStep'
+import AttributesStep from '@/routes/app/steps/AttributesStep'
+import ImagesStep from '@/routes/app/steps/ImagesStep'
+import ReviewStep from '@/routes/app/steps/ReviewStep'
+
+const STEPS = [
+  { key: 'basic', label: 'Datos básicos', Component: BasicInfoStep },
+  { key: 'pricing', label: 'Precio', Component: PricingStep },
+  { key: 'attributes', label: 'Atributos y variantes', Component: AttributesStep },
+  { key: 'images', label: 'Imágenes', Component: ImagesStep },
+  { key: 'review', label: 'Revisión', Component: ReviewStep },
+] as const
+
+export default function ProductStepper() {
+  const { userId } = useOutletContext<AppContext>()
+  const { catalogId, productId } = useParams<{ catalogId: string; productId: string }>()
+  const navigate = useNavigate()
+  const loading = useLoadedProducts(catalogId!)
+
+  const products = useEditorStore((s) => s.products)
+  const addProduct = useEditorStore((s) => s.addProduct)
+  const updateProduct = useEditorStore((s) => s.updateProduct)
+  const [stepIndex, setStepIndex] = useState(0)
+
+  const product = products.find((p) => p.id === productId)
+  const status = useAutosave(product)
+
+  useEffect(() => {
+    if (productId !== 'new' || loading) return
+    // Respect the product cap even if someone lands on /product/new directly.
+    // Read the current count from the store (not a dep) so adding the product
+    // below doesn't re-trigger this effect.
+    if (useEditorStore.getState().products.length >= MAX_PRODUCTS_PER_CATALOG) {
+      navigate(`/app/catalog/${catalogId}`, { replace: true })
+      return
+    }
+    const created = addProduct(catalogId!)
+    navigate(`/app/catalog/${catalogId}/product/${created.id}`, { replace: true })
+  }, [productId, loading, addProduct, catalogId, navigate])
+
+  if (loading || productId === 'new') {
+    return <div className="flex min-h-[60vh] items-center justify-center text-muted">Cargando…</div>
+  }
+
+  if (!product) {
+    return (
+      <div className="mx-auto max-w-xl px-6 py-16 text-center">
+        <p className="text-muted">No encontramos ese producto.</p>
+      </div>
+    )
+  }
+
+  const StepComponent = STEPS[stepIndex].Component
+
+  function onChange(patch: Partial<Product>) {
+    updateProduct(product!.id, patch)
+  }
+
+  function goNext() {
+    if (stepIndex < STEPS.length - 1) {
+      setStepIndex(stepIndex + 1)
+    } else {
+      navigate(`/app/catalog/${catalogId}`)
+    }
+  }
+
+  function goBack() {
+    if (stepIndex > 0) setStepIndex(stepIndex - 1)
+    else navigate(`/app/catalog/${catalogId}`)
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl px-6 py-12">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-display text-2xl font-bold">{product.name || 'Nuevo producto'}</h1>
+        <span className="text-xs text-faint">
+          {status === 'saving' && 'Guardando…'}
+          {status === 'saved' && 'Guardado'}
+          {status === 'error' && 'Error al guardar'}
+        </span>
+      </div>
+
+      <div className="mb-8 flex flex-wrap gap-2">
+        {STEPS.map((step, i) => (
+          <button
+            key={step.key}
+            type="button"
+            onClick={() => setStepIndex(i)}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+              i === stepIndex ? 'bg-accent text-on-accent' : 'bg-elevated text-muted hover:opacity-80'
+            }`}
+          >
+            {step.label}
+          </button>
+        ))}
+      </div>
+
+      <StepComponent product={product} onChange={onChange} userId={userId} catalogId={catalogId!} />
+
+      <div className="mt-10 flex justify-between">
+        <button
+          type="button"
+          onClick={goBack}
+          className="flex items-center gap-1 rounded-md border border-line px-4 py-2 text-sm hover:bg-elevated"
+        >
+          <ArrowLeft size={16} /> {stepIndex === 0 ? 'Volver al listado' : 'Atrás'}
+        </button>
+        <button
+          type="button"
+          onClick={goNext}
+          className="flex items-center gap-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:opacity-90"
+        >
+          {stepIndex === STEPS.length - 1 ? (
+            <>
+              Terminar <Check size={16} />
+            </>
+          ) : (
+            <>
+              Siguiente <ArrowRight size={16} />
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  )
+}
