@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { ImageOff, Star } from 'lucide-react'
+import { richTextContentClass } from '@/components/ui/RichTextEditor'
 import type { Product, Variant } from '@/lib/types'
 
 function formatPrice(value: number): string {
@@ -190,7 +191,11 @@ export function WooProductPreview({ product }: { product: Product }) {
         {product.description && (
           <div className="mt-6 border-t border-gray-200 pt-5">
             <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Descripción</h4>
-            <p className="mt-1 whitespace-pre-line text-sm text-gray-600">{product.description}</p>
+            {/* Own content, rendered only to its author (no cross-user surface, even in demo). */}
+            <div
+              className={`mt-1 text-sm text-gray-600 ${richTextContentClass}`}
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
           </div>
         )}
       </div>

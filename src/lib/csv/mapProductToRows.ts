@@ -1,16 +1,15 @@
 import type { Product } from '@/lib/types'
 import { generateSku } from '@/lib/csv/generateSku'
-import { formatPriceTiersSummary, mapPriceTiersToMeta } from '@/lib/csv/mapPriceTiersToCsvRepresentation'
 import type { CsvRow } from '@/lib/csv/types'
 
 const QUOTE_ONLY_NOTE = '[PRECIO A COTIZAR — contactar para cotización]'
 
 function buildDescription(product: Product): string {
   const parts = [product.description]
-  if (product.is_quote_only) parts.push(QUOTE_ONLY_NOTE)
-  const tiersSummary = formatPriceTiersSummary(product.price_tiers)
-  if (tiersSummary) parts.push(tiersSummary)
-  return parts.filter(Boolean).join('\n\n')
+  // The long description is HTML (rich-text editor), so the quote note goes in
+  // its own paragraph rather than being appended as loose text.
+  if (product.is_quote_only) parts.push(`<p>${QUOTE_ONLY_NOTE}</p>`)
+  return parts.filter(Boolean).join('\n')
 }
 
 function dims(product: Product) {
@@ -41,7 +40,6 @@ export function mapProductToRows(product: Product): CsvRow[] {
   const description = buildDescription(product)
   const { length, width, height } = dims(product)
   const images = product.images.map((img) => img.url).join(', ')
-  const metaPriceTiers = mapPriceTiersToMeta(product.price_tiers)
   const categories = buildCategories(product)
 
   if (product.attributes.length === 0) {
@@ -71,7 +69,6 @@ export function mapProductToRows(product: Product): CsvRow[] {
         'Width (cm)': width,
         'Height (cm)': height,
         Parent: '',
-        'Meta: price_tiers': metaPriceTiers,
         attributes: [],
       },
     ]
@@ -104,7 +101,6 @@ export function mapProductToRows(product: Product): CsvRow[] {
     'Width (cm)': width,
     'Height (cm)': height,
     Parent: '',
-    'Meta: price_tiers': metaPriceTiers,
     // global: true (not local/custom) so WooCommerce's importer creates/reuses
     // a real attribute taxonomy (pa_color, etc.) for this attribute name.
     // Local attributes read the values fine but WooCommerce's CSV importer
@@ -155,7 +151,6 @@ export function mapProductToRows(product: Product): CsvRow[] {
       'Width (cm)': variant.dimensions?.width != null ? String(variant.dimensions.width) : '',
       'Height (cm)': variant.dimensions?.height != null ? String(variant.dimensions.height) : '',
       Parent: parentSku,
-      'Meta: price_tiers': '',
       // Must match the parent row's `global` flag for the same attribute.
       attributes: product.attributes.map((attr) => ({
         name: attr.name,

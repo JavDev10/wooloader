@@ -45,7 +45,7 @@ export function buildCsv(products: Product[]): string {
     )
   }
 
-  const headers = [...BASE_COLUMNS, ...attributeColumns, 'Meta: price_tiers']
+  const headers = [...BASE_COLUMNS, ...attributeColumns]
 
   const flatRows = rows.map((row) => {
     const flat: Record<string, string> = {}
@@ -59,7 +59,6 @@ export function buildCsv(products: Product[]): string {
       flat[`Attribute ${n + 1} global`] = attr ? (attr.global ? '1' : '0') : ''
     }
 
-    flat['Meta: price_tiers'] = row['Meta: price_tiers']
     return flat
   })
 

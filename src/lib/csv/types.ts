@@ -29,6 +29,5 @@ export type CsvRow = {
   'Width (cm)': string
   'Height (cm)': string
   Parent: string
-  'Meta: price_tiers': string
   attributes: CsvAttributeColumn[]
 }
