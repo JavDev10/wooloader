@@ -1,0 +1,26 @@
+# Netlify deploy config for the static SPA.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: serve index.html for client-side routes (e.g. /app/catalog/xyz)
+# so a refresh or deep link doesn't 404. Real files (assets, favicon) are served
+# directly and only unmatched paths hit this rule.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers applied to every response.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    # CSP: only same-origin scripts (no inline — the theme init is /theme-init.js);
+    # Supabase for API/auth/storage/realtime; Google Fonts for the webfonts;
+    # data:/blob: images for favicons and in-browser image processing/previews.
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co"
