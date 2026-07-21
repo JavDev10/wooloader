@@ -1,5 +1,6 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ClipboardEvent, type ReactNode } from 'react'
 import { Bold, Italic, Heading2, Heading3, List, Pilcrow } from 'lucide-react'
+import { sanitizeHtml } from '@/lib/sanitizeHtml'
 
 /**
  * Shared styling for rendered rich-text HTML (headings, lists, paragraphs).
@@ -29,17 +30,33 @@ export function RichTextEditor({ id, value, onChange, placeholder }: RichTextEdi
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (ref.current && ref.current.innerHTML !== value) {
-      ref.current.innerHTML = value
-    }
-    // Init once from the loaded value; later changes come from the user, not props.
+    // Init once from the loaded value, sanitizing in case an older/tampered row
+    // holds unsafe HTML. Later changes come from the user, not props.
+    if (ref.current) ref.current.innerHTML = sanitizeHtml(value)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  /** Push the current editor HTML out, sanitized — the single boundary where the stored value is cleaned. */
+  function emit() {
+    if (ref.current) onChange(sanitizeHtml(ref.current.innerHTML))
+  }
 
   function exec(command: string, arg?: string) {
     document.execCommand(command, false, arg)
     ref.current?.focus()
-    if (ref.current) onChange(ref.current.innerHTML)
+    emit()
+  }
+
+  /** Paste as sanitized HTML (or plain text) so malicious/dirty markup never enters the DOM. */
+  function handlePaste(e: ClipboardEvent<HTMLDivElement>) {
+    e.preventDefault()
+    const html = e.clipboardData.getData('text/html')
+    if (html) {
+      document.execCommand('insertHTML', false, sanitizeHtml(html))
+    } else {
+      document.execCommand('insertText', false, e.clipboardData.getData('text/plain'))
+    }
+    emit()
   }
 
   return (
@@ -74,7 +91,8 @@ export function RichTextEditor({ id, value, onChange, placeholder }: RichTextEdi
         role="textbox"
         aria-multiline="true"
         data-placeholder={placeholder}
-        onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
+        onInput={emit}
+        onPaste={handlePaste}
         className={`min-h-[140px] px-3 py-2 text-sm outline-none empty:before:text-faint empty:before:content-[attr(data-placeholder)] ${richTextContentClass}`}
       />
     </div>
