@@ -92,15 +92,6 @@ describe('mapProductToRows — simple products', () => {
     expect(rows[0].Description).toContain('PRECIO A COTIZAR')
   })
 
-  it('summarizes quantity tiers in the description and serializes them to Meta: price_tiers', () => {
-    const rows = mapProductToRows(
-      simpleProduct({ price_tiers: [{ min_qty: 6, price: 2500 }, { min_qty: 1, price: 3000 }] }),
-    )
-    expect(rows[0].Description).toContain('1+ unidades: $3000 c/u')
-    expect(rows[0].Description).toContain('6+ unidades: $2500 c/u')
-    expect(JSON.parse(rows[0]['Meta: price_tiers'])).toHaveLength(2)
-  })
-
   it('sets a numeric Stock (which is what tells WooCommerce to manage inventory — there is no separate "Manage stock?" column)', () => {
     const rows = mapProductToRows(simpleProduct({ stock: 0 }))
     expect(rows[0].Stock).toBe('0')
@@ -206,7 +197,6 @@ describe('buildCsv', () => {
     const csv = buildCsv([simpleProduct(), variableProduct()])
     const [headerLine, ...lines] = csv.trim().split('\n')
     expect(headerLine).toContain('Attribute 1 name')
-    expect(headerLine).toContain('Meta: price_tiers')
     // 1 simple row + 1 parent + 2 variations
     expect(lines).toHaveLength(4)
   })

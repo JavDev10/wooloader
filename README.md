@@ -56,7 +56,7 @@ and the 24h anonymous-data cleanup job land in a later phase.
 The pure export core is ported and covered by tests (`npm test`):
 
 - `src/lib/csv/*` — maps a product to WooCommerce CSV rows (simple + variable/variation),
-  builds the full CSV, generates parent SKUs, serializes quantity price tiers.
+  builds the full CSV, generates parent SKUs.
 - `src/lib/variantCombinations.ts` — cartesian product of attributes + variant reconciliation.
 - `src/lib/productValidation.ts` — required-fields check (enforced at export time only).
 - `src/lib/priceFormat.ts`, `src/lib/weightFormat.ts` — input parsing/formatting.

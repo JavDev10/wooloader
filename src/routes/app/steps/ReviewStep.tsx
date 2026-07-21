@@ -32,15 +32,6 @@ export default function ReviewStep({ product }: StepProps) {
             : `${formatPrice(product.regular_price)}${product.sale_price ? ` (oferta ${formatPrice(product.sale_price)})` : ''}`}
         </dd>
 
-        {product.price_tiers.length > 0 && (
-          <>
-            <dt className="text-faint">Tramos</dt>
-            <dd>
-              {product.price_tiers.map((t) => `${t.min_qty}+ un.: $${t.price}`).join(' · ')}
-            </dd>
-          </>
-        )}
-
         <dt className="text-faint">Stock</dt>
         <dd>{product.stock === null ? 'Ilimitado' : product.stock}</dd>
 

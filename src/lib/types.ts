@@ -25,12 +25,6 @@ export const dimensionsSchema = z.object({
 })
 export type Dimensions = z.infer<typeof dimensionsSchema>
 
-export const priceTierSchema = z.object({
-  min_qty: z.number().int().positive(),
-  price: priceSchema,
-})
-export type PriceTier = z.infer<typeof priceTierSchema>
-
 export const attributeSchema = z.object({
   name: z.string().min(1),
   // No `.min(1)` here on purpose: the editor creates an attribute with an
@@ -98,7 +92,6 @@ export const productSchema = z.object({
   is_quote_only: z.boolean(),
   regular_price: priceSchema.nullable(),
   sale_price: priceSchema.nullable(),
-  price_tiers: z.array(priceTierSchema),
   attributes: z.array(attributeSchema),
   variants: z.array(variantSchema),
   images: z.array(productImageSchema),
@@ -141,7 +134,6 @@ export function createEmptyProduct(catalogId: string, localOrder: number): Produ
     is_quote_only: false,
     regular_price: null,
     sale_price: null,
-    price_tiers: [],
     attributes: [],
     variants: [],
     images: [],

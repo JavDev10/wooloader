@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Field, inputClass } from '@/components/ui/Field'
+import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { useCategorySuggestions, useSubcategorySuggestions } from '@/hooks/useCategorySuggestions'
 import { clampWeight, formatWeightDisplay, MIN_WEIGHT_KG, parseWeightInput } from '@/lib/weightFormat'
 import type { StepProps } from '@/routes/app/steps/types'
@@ -54,13 +55,11 @@ export default function BasicInfoStep({ product, onChange }: StepProps) {
       </Field>
 
       <Field label="Descripción larga" htmlFor="description">
-        <textarea
+        <RichTextEditor
           id="description"
-          rows={5}
-          className={inputClass}
           value={product.description}
-          onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Contá qué hace especial a este producto"
+          onChange={(html) => onChange({ description: html })}
+          placeholder="Contá qué hace especial a este producto…"
         />
       </Field>
 
