@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useEditorStore } from '@/store/editorStore'
-import { MAX_PRODUCTS_PER_CATALOG } from '@/lib/config'
+import { useLimits } from '@/context/LimitsContext'
 import type { AppContext } from '@/routes/app/RequireAuth'
 import type { Product } from '@/lib/types'
 import BasicInfoStep from '@/routes/app/steps/BasicInfoStep'
@@ -26,6 +26,7 @@ export default function ProductStepper() {
   const { catalogId, productId } = useParams<{ catalogId: string; productId: string }>()
   const navigate = useNavigate()
   const loading = useLoadedProducts(catalogId!)
+  const { atProductLimit, bumpProducts } = useLimits()
 
   const products = useEditorStore((s) => s.products)
   const addProduct = useEditorStore((s) => s.addProduct)
@@ -37,16 +38,16 @@ export default function ProductStepper() {
 
   useEffect(() => {
     if (productId !== 'new' || loading) return
-    // Respect the product cap even if someone lands on /product/new directly.
-    // Read the current count from the store (not a dep) so adding the product
-    // below doesn't re-trigger this effect.
-    if (useEditorStore.getState().products.length >= MAX_PRODUCTS_PER_CATALOG) {
+    // Respect the per-user product limit even if someone lands on /product/new
+    // directly (e.g. a bookmarked URL).
+    if (atProductLimit) {
       navigate(`/app/catalog/${catalogId}`, { replace: true })
       return
     }
     const created = addProduct(catalogId!)
+    bumpProducts(1)
     navigate(`/app/catalog/${catalogId}/product/${created.id}`, { replace: true })
-  }, [productId, loading, addProduct, catalogId, navigate])
+  }, [productId, loading, addProduct, catalogId, navigate, atProductLimit, bumpProducts])
 
   if (loading || productId === 'new') {
     return <div className="flex min-h-[60vh] items-center justify-center text-muted">Cargando…</div>

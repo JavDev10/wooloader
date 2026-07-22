@@ -8,12 +8,13 @@ import { getCatalog, renameCatalog } from '@/lib/api/catalogs'
 import { deleteProduct } from '@/lib/api/products'
 import { buildCsv, downloadCsv } from '@/lib/csv/buildCsv'
 import { inputClass } from '@/components/ui/Field'
-import { DEMO_MODE, MAX_PRODUCTS_PER_CATALOG } from '@/lib/config'
+import { useLimits } from '@/context/LimitsContext'
 
 export default function CatalogDetail() {
   const { catalogId } = useParams<{ catalogId: string }>()
   const navigate = useNavigate()
   const loading = useLoadedProducts(catalogId!)
+  const { enabled, maxProducts, productCount, atProductLimit, bumpProducts } = useLimits()
 
   const products = useEditorStore((s) => s.products)
   const addProduct = useEditorStore((s) => s.addProduct)
@@ -35,7 +36,7 @@ export default function CatalogDetail() {
         .catch(() => {})
   }, [catalogId])
 
-  const atLimit = products.length >= MAX_PRODUCTS_PER_CATALOG
+  const atLimit = atProductLimit
 
   async function saveName() {
     const trimmed = nameDraft.trim()
@@ -62,6 +63,7 @@ export default function CatalogDetail() {
   function handleAddProduct() {
     if (atLimit) return
     const created = addProduct(catalogId!)
+    bumpProducts(1)
     navigate(`/app/catalog/${catalogId}/product/${created.id}`)
   }
 
@@ -70,6 +72,7 @@ export default function CatalogDetail() {
     const source = products.find((p) => p.id === productId)
     if (!source) return
     const created = addProduct(catalogId!)
+    bumpProducts(1)
     updateProduct(created.id, {
       ...source,
       id: created.id,
@@ -81,6 +84,7 @@ export default function CatalogDetail() {
 
   async function handleDelete(productId: string) {
     removeProductLocal(productId)
+    bumpProducts(-1)
     await deleteProduct(productId)
   }
 
@@ -133,9 +137,9 @@ export default function CatalogDetail() {
           ? 'Todavía no cargaste ningún producto.'
           : `${products.length} producto${products.length === 1 ? '' : 's'}.`}
       </p>
-      {DEMO_MODE && (
+      {enabled && (
         <p className="mt-1 text-sm text-faint">
-          Modo demo: hasta {MAX_PRODUCTS_PER_CATALOG} productos por catálogo.
+          {productCount} de {maxProducts} productos usados en tu cuenta (sumando todos tus catálogos).
         </p>
       )}
 
@@ -187,7 +191,7 @@ export default function CatalogDetail() {
 
       {atLimit && (
         <p className="mt-2 text-center text-xs text-amber-400">
-          Alcanzaste el máximo de {MAX_PRODUCTS_PER_CATALOG} productos de la demo.
+          Alcanzaste el máximo de {maxProducts} productos de tu cuenta. Borrá alguno para agregar otro.
         </p>
       )}
 
