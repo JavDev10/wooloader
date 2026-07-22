@@ -57,6 +57,20 @@ set limits_enabled = true, max_products_per_user = 25, max_catalogs_per_user = 3
 The `25 / 3` defaults are sized for Supabase's free tier (its 1 GB Storage quota for product images
 is the first thing you'll exhaust). Raise them if you disable image uploads or move to a paid plan.
 
+### CAPTCHA (protect anonymous sign-ins from bots)
+
+Optional but recommended for a public demo. Uses **Cloudflare Turnstile** (free):
+
+1. Create a Turnstile widget at the Cloudflare dashboard → you get a **site key** (public) and a
+   **secret key**.
+2. Put the site key in `VITE_TURNSTILE_SITE_KEY` (build-time env). The login page then renders the
+   widget and sends its token with every sign-in / sign-up / anonymous sign-in.
+3. In Supabase → **Authentication → Attack Protection**, enable CAPTCHA, choose Turnstile, and paste
+   the **secret key**. Supabase then verifies the token server-side.
+
+Leave `VITE_TURNSTILE_SITE_KEY` empty to disable CAPTCHA (self-host). Supabase also applies a
+per-IP rate limit to anonymous sign-ins by default (**Authentication → Rate Limits**).
+
 On a normal self-hosted install leave `limits_enabled = false` (the default) — no limits apply, and
 the app fails open if `app_config` isn't reachable. Migration `0004` also restricts the
 `product-images` bucket to image types under 3 MB.
