@@ -8,7 +8,7 @@
       t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
     }
     document.documentElement.dataset.theme = t
-  } catch (e) {
+  } catch {
     document.documentElement.dataset.theme = 'dark'
   }
 })()

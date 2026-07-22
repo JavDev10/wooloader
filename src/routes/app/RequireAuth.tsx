@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
 import { getSession, onAuthStateChange } from '@/lib/api/auth'
 import { AppHeader } from '@/routes/app/AppHeader'
+import { LimitsProvider } from '@/context/LimitsContext'
 
 export type AppContext = {
   session: Session
@@ -33,7 +34,9 @@ export default function RequireAuth() {
   return (
     <div className="min-h-screen">
       <AppHeader session={session} />
-      <Outlet context={{ session, userId: session.user.id } satisfies AppContext} />
+      <LimitsProvider>
+        <Outlet context={{ session, userId: session.user.id } satisfies AppContext} />
+      </LimitsProvider>
     </div>
   )
 }

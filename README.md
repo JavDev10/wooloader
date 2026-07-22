@@ -38,24 +38,25 @@ npm run dev
 
 ### Hosted demo mode
 
-To run the limited public showcase (`VITE_DEMO_MODE=true`): enable **Allow anonymous sign-ins**
-in the Supabase dashboard (**Authentication → Providers**). Visitors then get a real anonymous
-`auth.uid()`, so the same row-level security isolates them from each other. A per-catalog product
-cap (`VITE_DEMO_MAX_PRODUCTS`) and ad slots apply only in demo mode.
+`VITE_DEMO_MODE=true` shows an anonymous "try it" entry on the login page — enable **Allow
+anonymous sign-ins** in the Supabase dashboard (**Authentication → Providers**). Visitors get a
+real anonymous `auth.uid()`, so the same row-level security isolates them from each other.
 
-**Server-side caps (important for a public demo).** The `VITE_DEMO_MAX_PRODUCTS` cap above is a
-UI-only convenience — anyone with the public anon key could bypass it via the API. Migration
-`0004` adds a real Postgres-level cap gated on an `app_config.demo_mode` flag. On the hosted demo,
-turn it on and match the number to `VITE_DEMO_MAX_PRODUCTS`:
+### Per-user limits (free tier)
+
+Limits are **per user, across all their catalogs** (a free tier for the hosted version) and apply
+to every account — anonymous and registered alike. They're enforced in Postgres (can't be bypassed
+via the API — migration `0006`) and their values live in the single-row `app_config` table, which
+the app reads to show usage. Turn them on and set the caps from the SQL editor:
 
 ```sql
 update public.app_config
-set demo_mode = true, max_products_per_catalog = 15, max_catalogs_per_user = 10;
+set limits_enabled = true, max_products_per_user = 50, max_catalogs_per_user = 10;
 ```
 
-On a normal self-hosted install leave `demo_mode = false` (the default) — the caps don't apply.
-Migration `0004` also restricts the `product-images` bucket to image types under 3 MB.
-The 24h anonymous-data cleanup job lands in a later phase.
+On a normal self-hosted install leave `limits_enabled = false` (the default) — no limits apply, and
+the app fails open if `app_config` isn't reachable. Migration `0004` also restricts the
+`product-images` bucket to image types under 3 MB.
 
 ## Scripts
 

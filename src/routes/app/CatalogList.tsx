@@ -5,12 +5,14 @@ import { FolderPlus, Trash2 } from 'lucide-react'
 import { createCatalog, deleteCatalogCompletely, listCatalogs } from '@/lib/api/catalogs'
 import { ConfirmButton } from '@/components/ui/ConfirmButton'
 import { inputClass } from '@/components/ui/Field'
+import { useLimits } from '@/context/LimitsContext'
 import type { Catalog } from '@/lib/types'
 import type { AppContext } from '@/routes/app/RequireAuth'
 
 export default function CatalogList() {
   const { userId } = useOutletContext<AppContext>()
   const navigate = useNavigate()
+  const { enabled, maxCatalogs, catalogCount, atCatalogLimit, bumpCatalogs } = useLimits()
   const [catalogs, setCatalogs] = useState<Catalog[] | null>(null)
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
@@ -20,10 +22,12 @@ export default function CatalogList() {
   }, [])
 
   async function handleCreate() {
+    if (atCatalogLimit) return
     const name = newName.trim() || 'Catálogo sin nombre'
     setCreating(true)
     try {
       const catalog = await createCatalog(name)
+      bumpCatalogs(1)
       navigate(`/app/catalog/${catalog.id}`)
     } catch {
       toast.error('No se pudo crear el catálogo.')
@@ -35,6 +39,7 @@ export default function CatalogList() {
     try {
       await deleteCatalogCompletely(userId, catalog.id)
       setCatalogs((prev) => (prev ?? []).filter((c) => c.id !== catalog.id))
+      bumpCatalogs(-1)
       toast.success(`Se borró "${catalog.name}".`)
     } catch {
       toast.error('No se pudo borrar el catálogo.')
@@ -47,6 +52,11 @@ export default function CatalogList() {
       <p className="mt-2 text-muted">
         Cada catálogo es un grupo de productos que exportás como un CSV para importar en WooCommerce.
       </p>
+      {enabled && (
+        <p className="mt-1 text-sm text-faint">
+          {catalogCount} de {maxCatalogs} catálogos usados en tu cuenta.
+        </p>
+      )}
 
       <div className="mt-8 flex gap-2">
         <input
@@ -55,16 +65,22 @@ export default function CatalogList() {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          disabled={atCatalogLimit}
         />
         <button
           type="button"
           onClick={handleCreate}
-          disabled={creating}
+          disabled={creating || atCatalogLimit}
           className="flex items-center gap-1 whitespace-nowrap rounded-md bg-accent px-4 py-2 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
         >
           <FolderPlus size={18} /> Crear
         </button>
       </div>
+      {atCatalogLimit && (
+        <p className="mt-2 text-xs text-amber-400">
+          Alcanzaste el máximo de {maxCatalogs} catálogos de tu cuenta. Borrá uno para crear otro.
+        </p>
+      )}
 
       <div className="mt-8 space-y-2">
         {catalogs === null && <p className="text-faint">Cargando…</p>}
