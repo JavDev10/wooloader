@@ -51,8 +51,11 @@ the app reads to show usage. Turn them on and set the caps from the SQL editor:
 
 ```sql
 update public.app_config
-set limits_enabled = true, max_products_per_user = 50, max_catalogs_per_user = 10;
+set limits_enabled = true, max_products_per_user = 25, max_catalogs_per_user = 3;
 ```
+
+The `25 / 3` defaults are sized for Supabase's free tier (its 1 GB Storage quota for product images
+is the first thing you'll exhaust). Raise them if you disable image uploads or move to a paid plan.
 
 On a normal self-hosted install leave `limits_enabled = false` (the default) — no limits apply, and
 the app fails open if `app_config` isn't reachable. Migration `0004` also restricts the

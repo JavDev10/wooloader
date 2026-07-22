@@ -7,10 +7,16 @@
 -- not secret, so they're made readable — the app reads them to show usage.
 
 -- ---- Config: rename the gate, add the per-user product cap, drop the old one.
+-- Defaults (25 products / 3 catalogs per user) are sized for Supabase's free
+-- tier, where the 1 GB Storage quota (product images) is the binding limit.
 alter table public.app_config rename column demo_mode to limits_enabled;
-alter table public.app_config add column if not exists max_products_per_user int not null default 50;
+alter table public.app_config add column if not exists max_products_per_user int not null default 25;
+alter table public.app_config alter column max_catalogs_per_user set default 3;
 alter table public.app_config drop column if exists max_products_per_catalog;
--- max_catalogs_per_user stays as-is.
+
+-- Move the existing singleton row to the new catalog default (it was 10 from
+-- migration 0004), unless an admin already changed it to something else.
+update public.app_config set max_catalogs_per_user = 3 where max_catalogs_per_user = 10;
 
 -- Let anyone read the single config row (limit values + flag) and their own
 -- usage. There's still no insert/update/delete policy, so values can only be
