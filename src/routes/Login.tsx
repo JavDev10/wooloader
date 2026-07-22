@@ -1,8 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { getSession, signIn, signInAnonymously, signUp } from '@/lib/api/auth'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { DEMO_MODE } from '@/lib/config'
+import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
+import { CAPTCHA_ENABLED, DEMO_MODE } from '@/lib/config'
 
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
 
@@ -14,6 +15,8 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [alreadySignedIn, setAlreadySignedIn] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileHandle>(null)
 
   useEffect(() => {
     getSession().then((session) => setAlreadySignedIn(session !== null))
@@ -23,19 +26,29 @@ export default function Login() {
     return <Navigate to="/app" replace />
   }
 
+  // With CAPTCHA on, actions stay disabled until the widget yields a token.
+  const needsCaptcha = CAPTCHA_ENABLED && !captchaToken
+
+  // A Turnstile token is single-use: after a failed attempt, refresh the widget
+  // so the next try gets a fresh one.
+  function resetCaptcha() {
+    turnstileRef.current?.reset()
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
       if (mode === 'signup') {
-        await signUp(email, password)
+        await signUp(email, password, captchaToken ?? undefined)
       } else {
-        await signIn(email, password)
+        await signIn(email, password, captchaToken ?? undefined)
       }
       navigate('/app', { replace: true })
     } catch {
       setError(mode === 'signup' ? 'No se pudo crear la cuenta.' : 'Email o contraseña incorrectos.')
+      resetCaptcha()
     } finally {
       setLoading(false)
     }
@@ -45,10 +58,11 @@ export default function Login() {
     setError(null)
     setLoading(true)
     try {
-      await signInAnonymously()
+      await signInAnonymously(captchaToken ?? undefined)
       navigate('/app', { replace: true })
     } catch {
       setError('No se pudo iniciar la demo.')
+      resetCaptcha()
       setLoading(false)
     }
   }
@@ -69,11 +83,16 @@ export default function Login() {
             Probá WooLoader sin registrarte. Es una demo: los datos son temporales y se borran
             automáticamente.
           </p>
+          {CAPTCHA_ENABLED && (
+            <div className="flex justify-center">
+              <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />
+            </div>
+          )}
           {error && <p className="text-sm text-red-400">{error}</p>}
           <button
             type="button"
             onClick={handleDemo}
-            disabled={loading}
+            disabled={loading || needsCaptcha}
             className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
           >
             {loading ? '…' : 'Probar la demo'}
@@ -96,11 +115,13 @@ export default function Login() {
             <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
           </div>
 
+          {CAPTCHA_ENABLED && <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />}
+
           {error && <p className="text-sm text-red-400">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || needsCaptcha}
             className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
           >
             {loading ? '…' : mode === 'signup' ? 'Crear cuenta' : 'Ingresar'}
