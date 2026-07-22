@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mapProductToRows } from '@/lib/csv/mapProductToRows'
-import { buildCsv } from '@/lib/csv/buildCsv'
+import { buildCsv, escapeCsvValue } from '@/lib/csv/buildCsv'
 import { createEmptyProduct, type Product } from '@/lib/types'
 
 function simpleProduct(overrides: Partial<Product> = {}): Product {
@@ -205,5 +205,28 @@ describe('buildCsv', () => {
     const csv = buildCsv([simpleProduct()])
     const [headerLine] = csv.trim().split('\n')
     expect(headerLine).not.toContain('Attribute 1 name')
+  })
+})
+
+describe('escapeCsvValue — formula-injection guard', () => {
+  it('prefixes cells starting with a formula trigger with a quote', () => {
+    expect(escapeCsvValue('=cmd()')).toBe("'=cmd()")
+    expect(escapeCsvValue('+1')).toBe("'+1")
+    expect(escapeCsvValue('-2+3')).toBe("'-2+3")
+    expect(escapeCsvValue('@SUM(A1)')).toBe("'@SUM(A1)")
+    expect(escapeCsvValue('\tstart-tab')).toBe("'\tstart-tab")
+  })
+
+  it('leaves ordinary values untouched', () => {
+    expect(escapeCsvValue('Mesa de comedor')).toBe('Mesa de comedor')
+    expect(escapeCsvValue('3990')).toBe('3990')
+    expect(escapeCsvValue('')).toBe('')
+    expect(escapeCsvValue('<p>hola</p>')).toBe('<p>hola</p>')
+  })
+
+  it('buildCsv neutralizes a formula-injecting product name', () => {
+    const csv = buildCsv([simpleProduct({ name: '=1+2' })])
+    expect(csv).toContain("'=1+2")
+    expect(csv).not.toMatch(/(^|,)=1\+2(,|$)/m)
   })
 })

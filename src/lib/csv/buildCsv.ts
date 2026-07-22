@@ -25,6 +25,18 @@ const BASE_COLUMNS: (keyof Omit<CsvRow, 'attributes'>)[] = [
   'Parent',
 ]
 
+// A cell starting with any of these is interpreted as a formula by Excel /
+// Google Sheets / LibreOffice if the CSV is opened in a spreadsheet (CSV
+// "formula injection"). PapaParse quoting does NOT prevent it — the quotes are
+// stripped on parse, leaving the formula. Prefixing with a single quote makes
+// the app treat the cell as text. This matches WooCommerce's own CSV exporter,
+// so the output stays "WooCommerce-shaped".
+const FORMULA_TRIGGER = /^[=+\-@\t\r]/
+
+export function escapeCsvValue(value: string): string {
+  return FORMULA_TRIGGER.test(value) ? `'${value}` : value
+}
+
 /**
  * Flattens every product into WooCommerce CSV Product Importer rows and
  * serializes to a CSV string. Attribute columns are padded to the widest
@@ -59,6 +71,8 @@ export function buildCsv(products: Product[]): string {
       flat[`Attribute ${n + 1} global`] = attr ? (attr.global ? '1' : '0') : ''
     }
 
+    // Neutralize any formula-triggering cell before serialization.
+    for (const key of Object.keys(flat)) flat[key] = escapeCsvValue(flat[key])
     return flat
   })
 
