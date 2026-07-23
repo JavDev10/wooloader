@@ -95,7 +95,7 @@ export default function Login() {
         // Demo instance: anonymous entry only. Email sign-in/up is deliberately
         // absent — email signups are disabled server-side on the demo, and demo
         // visitors shouldn't create real accounts.
-        <div className="w-full max-w-sm space-y-4 text-center">
+        <div className="w-full max-w-sm space-y-4 text-center motion-safe:animate-fade-up">
           <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
           <p className="text-muted">{t('login.demoIntro')}</p>
           {CAPTCHA_ENABLED && (
@@ -115,7 +115,7 @@ export default function Login() {
           {acceptanceLine}
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 motion-safe:animate-fade-up">
           <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
           <p className="text-muted">{mode === 'signup' ? t('login.signupSubtitle') : t('login.signinSubtitle')}</p>
 

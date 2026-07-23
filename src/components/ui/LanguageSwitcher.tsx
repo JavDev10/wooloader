@@ -100,7 +100,7 @@ export function LanguageSwitcher() {
         <div
           role="listbox"
           aria-label={t('common.language')}
-          className="absolute right-0 top-full z-50 mt-1 w-36 overflow-hidden rounded-md border border-line bg-app shadow-lg"
+          className="absolute right-0 top-full z-50 mt-1 w-36 origin-top-right overflow-hidden rounded-md border border-line bg-app shadow-lg motion-safe:animate-pop"
         >
           {LANGUAGES.map((lang) => (
             <button
