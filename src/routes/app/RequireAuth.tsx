@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
 import { getSession, onAuthStateChange } from '@/lib/api/auth'
@@ -13,6 +14,7 @@ export type AppContext = {
 }
 
 export default function RequireAuth() {
+  const { t } = useTranslation()
   const [session, setSession] = useState<Session | null | 'loading'>('loading')
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export default function RequireAuth() {
   if (session === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted">
-        Cargando…
+        {t('common.loading')}
       </div>
     )
   }

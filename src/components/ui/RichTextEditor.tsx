@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ClipboardEvent, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Bold, Italic, Heading2, Heading3, List, Pilcrow } from 'lucide-react'
 import { sanitizeHtml } from '@/lib/sanitizeHtml'
 
@@ -27,6 +28,7 @@ type RichTextEditorProps = {
  * caret is never reset mid-typing.
  */
 export function RichTextEditor({ id, value, onChange, placeholder }: RichTextEditorProps) {
+  const { t } = useTranslation()
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -62,24 +64,24 @@ export function RichTextEditor({ id, value, onChange, placeholder }: RichTextEdi
   return (
     <div className="rounded-md border border-line bg-surface focus-within:border-link">
       <div className="flex flex-wrap items-center gap-0.5 border-b border-line px-1.5 py-1">
-        <ToolbarButton onClick={() => exec('bold')} label="Negrita">
+        <ToolbarButton onClick={() => exec('bold')} label={t('richText.bold')}>
           <Bold size={15} />
         </ToolbarButton>
-        <ToolbarButton onClick={() => exec('italic')} label="Cursiva">
+        <ToolbarButton onClick={() => exec('italic')} label={t('richText.italic')}>
           <Italic size={15} />
         </ToolbarButton>
         <span className="mx-1 h-4 w-px bg-line" />
-        <ToolbarButton onClick={() => exec('formatBlock', 'h2')} label="Título">
+        <ToolbarButton onClick={() => exec('formatBlock', 'h2')} label={t('richText.heading')}>
           <Heading2 size={15} />
         </ToolbarButton>
-        <ToolbarButton onClick={() => exec('formatBlock', 'h3')} label="Subtítulo">
+        <ToolbarButton onClick={() => exec('formatBlock', 'h3')} label={t('richText.subheading')}>
           <Heading3 size={15} />
         </ToolbarButton>
-        <ToolbarButton onClick={() => exec('formatBlock', 'p')} label="Párrafo">
+        <ToolbarButton onClick={() => exec('formatBlock', 'p')} label={t('richText.paragraph')}>
           <Pilcrow size={15} />
         </ToolbarButton>
         <span className="mx-1 h-4 w-px bg-line" />
-        <ToolbarButton onClick={() => exec('insertUnorderedList')} label="Lista con viñetas">
+        <ToolbarButton onClick={() => exec('insertUnorderedList')} label={t('richText.bulletList')}>
           <List size={15} />
         </ToolbarButton>
       </div>

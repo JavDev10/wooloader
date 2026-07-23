@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ImageOff, Star } from 'lucide-react'
 import { richTextContentClass } from '@/components/ui/RichTextEditor'
 import { sanitizeHtml } from '@/lib/sanitizeHtml'
@@ -39,6 +40,7 @@ function renderPrice(price: number | null, salePrice: number | null): ReactNode 
  * on a real product page) and updates the price/image to match that variant.
  */
 export function WooProductPreview({ product }: { product: Product }) {
+  const { t } = useTranslation()
   const hasVariants = product.attributes.length > 0
 
   const [selection, setSelection] = useState<Record<string, string>>(() =>
@@ -75,7 +77,7 @@ export function WooProductPreview({ product }: { product: Product }) {
   const discountPercent =
     price && salePrice && salePrice < price ? Math.round(100 - (salePrice / price) * 100) : null
 
-  const breadcrumb = ['Tienda', product.category, product.subcategory].filter(Boolean).join(' / ')
+  const breadcrumb = [t('preview.store'), product.category, product.subcategory].filter(Boolean).join(' / ')
 
   return (
     // Stays within the page container (no viewport breakout — that would overlap
@@ -83,7 +85,7 @@ export function WooProductPreview({ product }: { product: Product }) {
     <div className="w-full">
       <div className="rounded-lg bg-white p-5 text-gray-900 shadow-lg">
         <p className="mb-4 truncate text-xs text-gray-400">
-          {breadcrumb} / {product.name || 'Producto'}
+          {breadcrumb} / {product.name || t('preview.productFallback')}
         </p>
 
         <div className="flex flex-col gap-6 sm:flex-row">
@@ -116,7 +118,7 @@ export function WooProductPreview({ product }: { product: Product }) {
                       className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded border-2 transition ${
                         isActive ? 'border-emerald-500' : 'border-gray-200 hover:border-gray-300'
                       }`}
-                      aria-label="Ver esta imagen"
+                      aria-label={t('preview.viewImage')}
                     >
                       <img src={img.url} alt="" className="h-full w-full object-cover" />
                     </button>
@@ -128,7 +130,7 @@ export function WooProductPreview({ product }: { product: Product }) {
 
           {/* Details */}
           <div className="min-w-0 flex-1">
-            <h3 className="text-xl font-semibold text-gray-900">{product.name || 'Nombre del producto'}</h3>
+            <h3 className="text-xl font-semibold text-gray-900">{product.name || t('preview.productNameFallback')}</h3>
 
             <div className="mt-1 flex items-center gap-2">
               <div className="flex gap-0.5 text-amber-400" aria-hidden="true">
@@ -136,16 +138,16 @@ export function WooProductPreview({ product }: { product: Product }) {
                   <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[10px] text-gray-400">(ejemplo)</span>
+              <span className="text-[10px] text-gray-400">{t('preview.example')}</span>
             </div>
 
             <p className="mt-3 text-2xl font-bold text-emerald-600">
               {product.is_quote_only
-                ? 'Consultar precio'
+                ? t('preview.askPrice')
                 : priceRange
                   ? priceRange.min === priceRange.max
                     ? formatPrice(priceRange.min)
-                    : `Desde ${formatPrice(priceRange.min)}`
+                    : t('preview.from', { price: formatPrice(priceRange.min) })
                   : renderPrice(price, salePrice)}
             </p>
 
@@ -172,7 +174,7 @@ export function WooProductPreview({ product }: { product: Product }) {
                   </label>
                 ))}
                 {!selectedVariant && (
-                  <p className="text-xs text-amber-600">Esa combinación todavía no tiene precio cargado.</p>
+                  <p className="text-xs text-amber-600">{t('preview.noVariantPrice')}</p>
                 )}
               </div>
             )}
@@ -182,7 +184,7 @@ export function WooProductPreview({ product }: { product: Product }) {
               disabled
               className="mt-5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-on-accent"
             >
-              Agregar al carrito
+              {t('preview.addToCart')}
             </button>
           </div>
         </div>
@@ -190,7 +192,7 @@ export function WooProductPreview({ product }: { product: Product }) {
         {/* Long description below, like the description area of a real product page */}
         {product.description && (
           <div className="mt-6 border-t border-gray-200 pt-5">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Descripción</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('preview.description')}</h4>
             <div
               className={`mt-1 text-sm text-gray-600 ${richTextContentClass}`}
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}

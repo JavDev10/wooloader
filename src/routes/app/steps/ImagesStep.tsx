@@ -1,11 +1,13 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { useTranslation } from 'react-i18next'
 import { Trash2 } from 'lucide-react'
 import { deleteProductImage, uploadProductImage } from '@/lib/api/storage'
 import { processImage, SQUARE_IMAGE_SIZE } from '@/lib/imageValidation'
 import type { StepProps } from '@/routes/app/steps/types'
 
 export default function ImagesStep({ product, onChange, userId, catalogId }: StepProps) {
+  const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
 
   const onDrop = useCallback(
@@ -49,7 +51,7 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted">Imágenes del producto</p>
+      <p className="text-sm text-muted">{t('images.title')}</p>
 
       <label className="flex items-start gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm">
         <input
@@ -59,10 +61,8 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
           className="mt-0.5 h-4 w-4 accent-accent"
         />
         <span>
-          Dejar las imágenes en formato cuadrado ({SQUARE_IMAGE_SIZE}×{SQUARE_IMAGE_SIZE})
-          <span className="mt-0.5 block text-xs text-faint">
-            Se recortan al centro. Se aplica a las imágenes que subas de ahora en adelante.
-          </span>
+          {t('images.squareLabel', { size: SQUARE_IMAGE_SIZE })}
+          <span className="mt-0.5 block text-xs text-faint">{t('images.squareHint')}</span>
         </span>
       </label>
 
@@ -73,9 +73,7 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
         }`}
       >
         <input {...getInputProps()} />
-        <p className="text-muted">
-          {uploading ? 'Subiendo…' : 'Arrastrá las fotos acá o hacé clic para elegirlas'}
-        </p>
+        <p className="text-muted">{uploading ? t('images.uploading') : t('images.dropzone')}</p>
       </div>
 
       {product.images.length > 0 && (
@@ -85,14 +83,14 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
               <img src={img.url} alt="" className="aspect-square w-full rounded-md object-cover" />
               {img.is_primary && (
                 <span className="absolute left-1 top-1 rounded bg-accent px-1.5 py-0.5 text-xs font-semibold text-on-accent">
-                  Principal
+                  {t('images.primary')}
                 </span>
               )}
               <button
                 type="button"
                 onClick={() => removeImage(img.storage_path)}
                 className="absolute right-1 top-1 rounded-full bg-black/60 p-1 opacity-0 transition group-hover:opacity-100"
-                aria-label="Eliminar imagen"
+                aria-label={t('images.deleteImage')}
               >
                 <Trash2 size={14} />
               </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Field, inputClass } from '@/components/ui/Field'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { useCategorySuggestions, useSubcategorySuggestions } from '@/hooks/useCategorySuggestions'
@@ -9,6 +10,7 @@ import type { StepProps } from '@/routes/app/steps/types'
 const WEIGHT_UNITS: WeightUnit[] = ['kg', 'lb']
 
 export default function BasicInfoStep({ product, onChange, weightUnit, onWeightUnitChange }: StepProps) {
+  const { t } = useTranslation()
   const categories = useCategorySuggestions()
   const subcategories = useSubcategorySuggestions(product.category)
   const [weightFocused, setWeightFocused] = useState(false)
@@ -32,42 +34,38 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
 
   return (
     <div className="space-y-5">
-      <Field label="Nombre del producto" htmlFor="name">
+      <Field label={t('basic.name')} htmlFor="name">
         <input
           id="name"
           className={inputClass}
           value={product.name}
           onChange={(e) => onChange({ name: e.target.value })}
-          placeholder='Ej: "Mesa de comedor de pino"'
+          placeholder={t('basic.namePlaceholder')}
         />
       </Field>
 
-      <Field
-        label="Descripción corta"
-        htmlFor="short_description"
-        hint="Resumen breve que aparece junto al precio en la tienda."
-      >
+      <Field label={t('basic.shortDescription')} htmlFor="short_description" hint={t('basic.shortDescriptionHint')}>
         <textarea
           id="short_description"
           rows={2}
           className={inputClass}
           value={product.short_description}
           onChange={(e) => onChange({ short_description: e.target.value })}
-          placeholder="Resumen breve del producto"
+          placeholder={t('basic.shortDescriptionPlaceholder')}
         />
       </Field>
 
-      <Field label="Descripción larga" htmlFor="description">
+      <Field label={t('basic.description')} htmlFor="description">
         <RichTextEditor
           id="description"
           value={product.description}
           onChange={(html) => onChange({ description: html })}
-          placeholder="Contá qué hace especial a este producto…"
+          placeholder={t('basic.descriptionPlaceholder')}
         />
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Categoría" htmlFor="category" hint="Ej: Comedor, Fitness, Marca">
+        <Field label={t('basic.category')} htmlFor="category" hint={t('basic.categoryHint')}>
           <input
             id="category"
             list="category-suggestions"
@@ -82,7 +80,7 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
           </datalist>
         </Field>
 
-        <Field label="Subcategoría" htmlFor="subcategory" hint="Ej: Marca1, Marca2">
+        <Field label={t('basic.subcategory')} htmlFor="subcategory" hint={t('basic.subcategoryHint')}>
           <input
             id="subcategory"
             list="subcategory-suggestions"
@@ -105,13 +103,13 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
           onChange={(e) => onChange({ no_physical_dimensions: e.target.checked })}
           className="h-4 w-4 accent-accent"
         />
-        <span>Este producto no tiene peso ni dimensiones físicas (ej. servicio, producto digital)</span>
+        <span>{t('basic.noPhysical')}</span>
       </label>
 
       {!product.no_physical_dimensions && (
         <>
           <div className="grid grid-cols-2 gap-4">
-            <Field label={`Peso (${weightUnit})`} htmlFor="weight">
+            <Field label={t('basic.weight', { unit: weightUnit })} htmlFor="weight">
               <div className="flex gap-2">
                 <input
                   id="weight"
@@ -127,7 +125,11 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
                   onBlur={() => setWeightFocused(false)}
                   placeholder="0"
                 />
-                <div className="flex shrink-0 overflow-hidden rounded-md border border-line" role="group" aria-label="Unidad de peso">
+                <div
+                  className="flex shrink-0 overflow-hidden rounded-md border border-line"
+                  role="group"
+                  aria-label={t('basic.weightUnitAria')}
+                >
                   {WEIGHT_UNITS.map((unit) => (
                     <button
                       key={unit}
@@ -148,14 +150,14 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
             </Field>
           </div>
 
-          <Field label="Dimensiones (cm)" htmlFor="dim-length">
+          <Field label={t('basic.dimensions')} htmlFor="dim-length">
             <div className="grid grid-cols-3 gap-3">
               <input
                 id="dim-length"
                 type="number"
                 min="0"
                 step="0.1"
-                placeholder="Largo"
+                placeholder={t('basic.length')}
                 className={inputClass}
                 value={product.dimensions?.length ?? ''}
                 onChange={(e) => setDimension('length', e.target.value)}
@@ -164,7 +166,7 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
                 type="number"
                 min="0"
                 step="0.1"
-                placeholder="Ancho"
+                placeholder={t('basic.width')}
                 className={inputClass}
                 value={product.dimensions?.width ?? ''}
                 onChange={(e) => setDimension('width', e.target.value)}
@@ -173,7 +175,7 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
                 type="number"
                 min="0"
                 step="0.1"
-                placeholder="Alto"
+                placeholder={t('basic.height')}
                 className={inputClass}
                 value={product.dimensions?.height ?? ''}
                 onChange={(e) => setDimension('height', e.target.value)}

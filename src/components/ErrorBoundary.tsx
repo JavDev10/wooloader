@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import i18n from '@/i18n'
 
 type Props = { children: ReactNode }
 type State = { error: Error | null; componentStack: string | null; copied: boolean }
@@ -39,21 +40,19 @@ export class ErrorBoundary extends Component<Props, State> {
       const details = this.buildDetails()
       return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center">
-          <h1 className="font-display text-2xl font-bold text-accent-ink">Algo salió mal</h1>
-          <p className="max-w-md text-muted">
-            Ocurrió un error inesperado. Prueba recargar la página; si el problema sigue, revisa los detalles técnicos.
-          </p>
+          <h1 className="font-display text-2xl font-bold text-accent-ink">{i18n.t('errorBoundary.title')}</h1>
+          <p className="max-w-md text-muted">{i18n.t('errorBoundary.body')}</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
             className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:opacity-90"
           >
-            Recargar
+            {i18n.t('errorBoundary.reload')}
           </button>
 
           <details className="mt-6 w-full max-w-lg text-left">
             <summary className="cursor-pointer text-xs text-faint hover:text-muted">
-              Detalles técnicos
+              {i18n.t('errorBoundary.details')}
             </summary>
             <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-elevated p-3 text-[11px] leading-relaxed text-muted">
               {details}
@@ -73,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
               }}
               className="mt-2 rounded-md border border-line px-3 py-1.5 text-xs text-muted hover:bg-elevated"
             >
-              {this.state.copied ? 'Copiado ✓' : 'Copiar detalles'}
+              {this.state.copied ? i18n.t('errorBoundary.copied') : i18n.t('errorBoundary.copy')}
             </button>
           </details>
         </div>

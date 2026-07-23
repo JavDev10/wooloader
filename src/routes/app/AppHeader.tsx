@@ -1,14 +1,17 @@
 import { useState, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { LogOut, Pencil, PackagePlus } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
 import { signOut, updateDisplayName } from '@/lib/api/auth'
 import { inputClass } from '@/components/ui/Field'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { DEMO_MODE } from '@/lib/config'
 
 export function AppHeader({ session }: { session: Session }) {
+  const { t } = useTranslation()
   const isAnon = session.user.is_anonymous ?? false
   const currentName = (session.user.user_metadata?.full_name as string | undefined) ?? ''
   const [editing, setEditing] = useState(false)
@@ -22,9 +25,9 @@ export function AppHeader({ session }: { session: Session }) {
     try {
       await updateDisplayName(trimmed)
       setEditing(false)
-      toast.success('Nombre actualizado.')
+      toast.success(t('header.nameUpdated'))
     } catch {
-      toast.error('No se pudo actualizar el nombre.')
+      toast.error(t('header.nameUpdateError'))
     } finally {
       setSaving(false)
     }
@@ -47,9 +50,10 @@ export function AppHeader({ session }: { session: Session }) {
       </Link>
 
       <div className="flex items-center gap-4">
+        <LanguageSwitcher />
         <ThemeToggle />
         {isAnon ? (
-          <span className="text-sm text-faint">Sesión de prueba</span>
+          <span className="text-sm text-faint">{t('header.demoSession')}</span>
         ) : editing ? (
           <input
             autoFocus
@@ -59,7 +63,7 @@ export function AppHeader({ session }: { session: Session }) {
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             disabled={saving}
-            placeholder="Tu nombre"
+            placeholder={t('header.yourName')}
           />
         ) : (
           <button
@@ -77,7 +81,7 @@ export function AppHeader({ session }: { session: Session }) {
           onClick={() => signOut()}
           className="flex items-center gap-1 text-sm text-faint hover:text-red-400"
         >
-          <LogOut size={14} /> Salir
+          <LogOut size={14} /> {t('header.signOut')}
         </button>
       </div>
     </header>

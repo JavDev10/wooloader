@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Copy, Download, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useEditorStore } from '@/store/editorStore'
@@ -12,6 +13,7 @@ import { useLimits } from '@/context/LimitsContext'
 import type { WeightUnit } from '@/lib/types'
 
 export default function CatalogDetail() {
+  const { t } = useTranslation()
   const { catalogId } = useParams<{ catalogId: string }>()
   const navigate = useNavigate()
   const loading = useLoadedProducts(catalogId!)
@@ -53,7 +55,7 @@ export default function CatalogDetail() {
       await renameCatalog(catalogId!, trimmed)
       savedNameRef.current = trimmed
     } catch {
-      toast.error('No se pudo renombrar el catálogo.')
+      toast.error(t('catalog.renameError'))
       setCatalogName(savedNameRef.current)
     }
   }
@@ -80,7 +82,7 @@ export default function CatalogDetail() {
       ...source,
       id: created.id,
       local_order: created.local_order,
-      name: `${source.name} (copia)`,
+      name: `${source.name} ${t('catalog.copySuffix')}`,
     })
     navigate(`/app/catalog/${catalogId}/product/${created.id}`)
   }
@@ -93,12 +95,12 @@ export default function CatalogDetail() {
 
   function handleExport() {
     const csv = buildCsv(products, { weightUnit })
-    const filename = `${(catalogName || 'catalogo').replace(/\s+/g, '-').toLowerCase()}-productos.csv`
+    const filename = `${(catalogName || 'catalogo').replace(/\s+/g, '-').toLowerCase()}-${t('catalog.exportFileSuffix')}.csv`
     downloadCsv(filename, csv)
   }
 
   if (loading) {
-    return <div className="flex min-h-[60vh] items-center justify-center text-muted">Cargando…</div>
+    return <div className="flex min-h-[60vh] items-center justify-center text-muted">{t('common.loading')}</div>
   }
 
   return (
@@ -108,7 +110,7 @@ export default function CatalogDetail() {
         onClick={() => navigate('/app')}
         className="mb-4 flex items-center gap-1 text-sm text-faint hover:text-fg"
       >
-        <ArrowLeft size={16} /> Todos los catálogos
+        <ArrowLeft size={16} /> {t('catalog.backToList')}
       </button>
 
       {editingName ? (
@@ -119,7 +121,7 @@ export default function CatalogDetail() {
           onChange={(e) => setNameDraft(e.target.value)}
           onBlur={saveName}
           onKeyDown={handleNameKeyDown}
-          placeholder="Nombre del catálogo"
+          placeholder={t('catalog.namePlaceholder')}
         />
       ) : (
         <button
@@ -130,19 +132,17 @@ export default function CatalogDetail() {
           }}
           className="group flex items-center gap-2 text-left"
         >
-          <h1 className="font-display text-3xl font-bold">{catalogName || 'Catálogo'}</h1>
+          <h1 className="font-display text-3xl font-bold">{catalogName || t('catalog.fallbackName')}</h1>
           <Pencil size={16} className="text-faint group-hover:text-muted" />
         </button>
       )}
 
       <p className="mt-2 text-muted">
-        {products.length === 0
-          ? 'Todavía no cargaste ningún producto.'
-          : `${products.length} producto${products.length === 1 ? '' : 's'}.`}
+        {products.length === 0 ? t('catalog.empty') : t('catalog.productCount', { count: products.length })}
       </p>
       {enabled && (
         <p className="mt-1 text-sm text-faint">
-          {productCount} de {maxProducts} productos usados en tu cuenta (sumando todos tus catálogos).
+          {t('catalog.usage', { count: productCount, max: maxProducts })}
         </p>
       )}
 
@@ -157,7 +157,7 @@ export default function CatalogDetail() {
               onClick={() => navigate(`/app/catalog/${catalogId}/product/${product.id}`)}
               className="flex-1 text-left"
             >
-              <span className="font-medium">{product.name || 'Producto sin nombre'}</span>
+              <span className="font-medium">{product.name || t('catalog.unnamedProduct')}</span>
               {product.category && <span className="ml-2 text-sm text-faint">{product.category}</span>}
             </button>
             <div className="flex items-center gap-3">
@@ -166,7 +166,7 @@ export default function CatalogDetail() {
                 onClick={() => handleDuplicate(product.id)}
                 disabled={atLimit}
                 className="text-faint hover:text-link disabled:opacity-30 disabled:hover:text-faint"
-                aria-label="Duplicar producto"
+                aria-label={t('catalog.duplicate')}
               >
                 <Copy size={16} />
               </button>
@@ -174,7 +174,7 @@ export default function CatalogDetail() {
                 type="button"
                 onClick={() => handleDelete(product.id)}
                 className="text-faint hover:text-red-400"
-                aria-label="Eliminar producto"
+                aria-label={t('catalog.deleteProduct')}
               >
                 <Trash2 size={16} />
               </button>
@@ -189,13 +189,11 @@ export default function CatalogDetail() {
         disabled={atLimit}
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-line px-4 py-3 text-muted hover:border-accent hover:text-accent-ink disabled:opacity-40 disabled:hover:border-line disabled:hover:text-muted"
       >
-        <Plus size={18} /> Agregar producto
+        <Plus size={18} /> {t('catalog.addProduct')}
       </button>
 
       {atLimit && (
-        <p className="mt-2 text-center text-xs text-amber-400">
-          Alcanzaste el máximo de {maxProducts} productos de tu cuenta. Borrá alguno para agregar otro.
-        </p>
+        <p className="mt-2 text-center text-xs text-amber-400">{t('catalog.atLimit', { max: maxProducts })}</p>
       )}
 
       <button
@@ -204,7 +202,7 @@ export default function CatalogDetail() {
         disabled={products.length === 0}
         className="mt-8 flex w-full items-center justify-center gap-2 rounded-md bg-accent px-4 py-3 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
       >
-        <Download size={18} /> Exportar CSV para WooCommerce
+        <Download size={18} /> {t('catalog.exportCsv')}
       </button>
     </div>
   )
