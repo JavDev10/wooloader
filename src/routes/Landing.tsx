@@ -1,61 +1,65 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PackagePlus, Upload, Table2, Layers } from 'lucide-react'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { DEMO_MODE } from '@/lib/config'
 
 export default function Landing() {
+  const { t } = useTranslation()
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-display text-lg font-bold">
           <PackagePlus size={22} className="text-accent-ink" /> WooLoader
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </div>
 
       <h1 className="mt-10 font-display text-4xl font-bold leading-tight sm:text-5xl">
-        Cargá tu catálogo de productos y exportalo a WooCommerce en minutos.
+        {t('landing.headline')}
       </h1>
-      <p className="mt-4 max-w-xl text-lg text-muted">
-        Una interfaz visual simple para armar productos —simples o con variantes, imágenes y precios—
-        y bajar un CSV listo para el importador nativo de WooCommerce. Open source y autohospedable.
-      </p>
+      <p className="mt-4 max-w-xl text-lg text-muted">{t('landing.subtitle')}</p>
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           to="/login"
           className="rounded-md bg-accent px-5 py-3 font-semibold text-on-accent hover:opacity-90"
         >
-          {DEMO_MODE ? 'Probar la demo' : 'Ingresar'}
+          {DEMO_MODE ? t('landing.tryDemo') : t('landing.signIn')}
         </Link>
         <a
           href="https://github.com/JavDev10/wooloader"
           className="rounded-md border border-line px-5 py-3 font-medium text-fg hover:bg-elevated"
         >
-          Ver en GitHub
+          {t('landing.viewOnGithub')}
         </a>
       </div>
 
       <div className="mt-16 grid gap-6 sm:grid-cols-3">
-        <Feature icon={<Layers size={20} />} title="Productos con variantes">
-          Definí atributos (Color, Talla…) y generá todas las combinaciones con su precio y stock.
+        <Feature icon={<Layers size={20} />} title={t('landing.feature1Title')}>
+          {t('landing.feature1Body')}
         </Feature>
-        <Feature icon={<Upload size={20} />} title="Imágenes optimizadas">
-          Subí fotos que se recortan y comprimen solas para que importen sin problemas.
+        <Feature icon={<Upload size={20} />} title={t('landing.feature2Title')}>
+          {t('landing.feature2Body')}
         </Feature>
-        <Feature icon={<Table2 size={20} />} title="CSV nativo de WooCommerce">
-          Exportá un archivo compatible con el importador de productos, sin plugins raros.
+        <Feature icon={<Table2 size={20} />} title={t('landing.feature3Title')}>
+          {t('landing.feature3Body')}
         </Feature>
       </div>
 
       <footer className="mt-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line pt-6 text-sm text-faint">
         <span>© {new Date().getFullYear()} WooLoader</span>
         <Link to="/terminos" className="hover:text-fg">
-          Términos y condiciones
+          {t('landing.terms')}
         </Link>
         <Link to="/privacidad" className="hover:text-fg">
-          Privacidad y cookies
+          {t('landing.privacy')}
         </Link>
         <a href="https://github.com/JavDev10/wooloader" className="hover:text-fg">
           GitHub

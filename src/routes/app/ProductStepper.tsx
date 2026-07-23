@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useEditorStore } from '@/store/editorStore'
@@ -16,14 +17,15 @@ import ImagesStep from '@/routes/app/steps/ImagesStep'
 import ReviewStep from '@/routes/app/steps/ReviewStep'
 
 const STEPS = [
-  { key: 'basic', label: 'Datos básicos', Component: BasicInfoStep },
-  { key: 'pricing', label: 'Precio', Component: PricingStep },
-  { key: 'attributes', label: 'Atributos y variantes', Component: AttributesStep },
-  { key: 'images', label: 'Imágenes', Component: ImagesStep },
-  { key: 'review', label: 'Revisión', Component: ReviewStep },
+  { key: 'basic', labelKey: 'stepper.stepBasic', Component: BasicInfoStep },
+  { key: 'pricing', labelKey: 'stepper.stepPricing', Component: PricingStep },
+  { key: 'attributes', labelKey: 'stepper.stepAttributes', Component: AttributesStep },
+  { key: 'images', labelKey: 'stepper.stepImages', Component: ImagesStep },
+  { key: 'review', labelKey: 'stepper.stepReview', Component: ReviewStep },
 ] as const
 
 export default function ProductStepper() {
+  const { t } = useTranslation()
   const { userId } = useOutletContext<AppContext>()
   const { catalogId, productId } = useParams<{ catalogId: string; productId: string }>()
   const navigate = useNavigate()
@@ -46,7 +48,7 @@ export default function ProductStepper() {
   function handleWeightUnitChange(unit: WeightUnit) {
     setWeightUnit(unit)
     setCatalogWeightUnit(catalogId!, unit).catch(() => {
-      toast.error('No se pudo cambiar la unidad de peso.')
+      toast.error(t('stepper.weightUnitError'))
       setWeightUnit(weightUnit)
     })
   }
@@ -65,13 +67,13 @@ export default function ProductStepper() {
   }, [productId, loading, addProduct, catalogId, navigate, atProductLimit, bumpProducts])
 
   if (loading || productId === 'new') {
-    return <div className="flex min-h-[60vh] items-center justify-center text-muted">Cargando…</div>
+    return <div className="flex min-h-[60vh] items-center justify-center text-muted">{t('common.loading')}</div>
   }
 
   if (!product) {
     return (
       <div className="mx-auto max-w-xl px-6 py-16 text-center">
-        <p className="text-muted">No encontramos ese producto.</p>
+        <p className="text-muted">{t('stepper.notFound')}</p>
       </div>
     )
   }
@@ -98,11 +100,11 @@ export default function ProductStepper() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">{product.name || 'Nuevo producto'}</h1>
+        <h1 className="font-display text-2xl font-bold">{product.name || t('stepper.newProduct')}</h1>
         <span className="text-xs text-faint">
-          {status === 'saving' && 'Guardando…'}
-          {status === 'saved' && 'Guardado'}
-          {status === 'error' && 'Error al guardar'}
+          {status === 'saving' && t('stepper.saving')}
+          {status === 'saved' && t('stepper.saved')}
+          {status === 'error' && t('stepper.saveError')}
         </span>
       </div>
 
@@ -116,7 +118,7 @@ export default function ProductStepper() {
               i === stepIndex ? 'bg-accent text-on-accent' : 'bg-elevated text-muted hover:opacity-80'
             }`}
           >
-            {step.label}
+            {t(step.labelKey)}
           </button>
         ))}
       </div>
@@ -136,7 +138,7 @@ export default function ProductStepper() {
           onClick={goBack}
           className="flex items-center gap-1 rounded-md border border-line px-4 py-2 text-sm hover:bg-elevated"
         >
-          <ArrowLeft size={16} /> {stepIndex === 0 ? 'Volver al listado' : 'Atrás'}
+          <ArrowLeft size={16} /> {stepIndex === 0 ? t('stepper.backToCatalog') : t('stepper.back')}
         </button>
         <button
           type="button"
@@ -145,11 +147,11 @@ export default function ProductStepper() {
         >
           {stepIndex === STEPS.length - 1 ? (
             <>
-              Terminar <Check size={16} />
+              {t('stepper.finish')} <Check size={16} />
             </>
           ) : (
             <>
-              Siguiente <ArrowRight size={16} />
+              {t('stepper.next')} <ArrowRight size={16} />
             </>
           )}
         </button>

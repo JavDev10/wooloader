@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getSession, signIn, signInAnonymously, signUp } from '@/lib/api/auth'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
 import { CAPTCHA_ENABLED, DEMO_MODE } from '@/lib/config'
@@ -8,6 +10,7 @@ import { CAPTCHA_ENABLED, DEMO_MODE } from '@/lib/config'
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
 
 export default function Login() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
@@ -47,7 +50,7 @@ export default function Login() {
       }
       navigate('/app', { replace: true })
     } catch {
-      setError(mode === 'signup' ? 'No se pudo crear la cuenta.' : 'Email o contraseña incorrectos.')
+      setError(mode === 'signup' ? t('login.signupError') : t('login.signinError'))
       resetCaptcha()
     } finally {
       setLoading(false)
@@ -61,15 +64,30 @@ export default function Login() {
       await signInAnonymously(captchaToken ?? undefined)
       navigate('/app', { replace: true })
     } catch {
-      setError('No se pudo iniciar la demo.')
+      setError(t('login.demoError'))
       resetCaptcha()
       setLoading(false)
     }
   }
 
+  const acceptanceLine = (
+    <p className="text-center text-xs text-faint">
+      {t('login.acceptPrefix')}{' '}
+      <Link to="/terminos" className="text-link hover:underline">
+        {t('login.terms')}
+      </Link>{' '}
+      {t('login.acceptMiddle')}{' '}
+      <Link to="/privacidad" className="text-link hover:underline">
+        {t('login.privacy')}
+      </Link>
+      .
+    </p>
+  )
+
   return (
     <div className="relative flex min-h-screen items-center justify-center px-6">
-      <div className="absolute right-6 top-6">
+      <div className="absolute right-6 top-6 flex items-center gap-3">
+        <LanguageSwitcher />
         <ThemeToggle />
       </div>
 
@@ -79,10 +97,7 @@ export default function Login() {
         // visitors shouldn't create real accounts.
         <div className="w-full max-w-sm space-y-4 text-center">
           <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
-          <p className="text-muted">
-            Probá WooLoader sin registrarte. Es una demo: los datos son temporales y pueden borrarse
-            en cualquier momento.
-          </p>
+          <p className="text-muted">{t('login.demoIntro')}</p>
           {CAPTCHA_ENABLED && (
             <div className="flex justify-center">
               <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />
@@ -95,34 +110,22 @@ export default function Login() {
             disabled={loading || needsCaptcha}
             className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? '…' : 'Probar la demo'}
+            {loading ? '…' : t('login.tryDemo')}
           </button>
-          <p className="text-xs text-faint">
-            Al continuar, aceptás los{' '}
-            <Link to="/terminos" className="text-link hover:underline">
-              Términos y condiciones
-            </Link>{' '}
-            y la{' '}
-            <Link to="/privacidad" className="text-link hover:underline">
-              Política de privacidad
-            </Link>
-            .
-          </p>
+          {acceptanceLine}
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
           <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
-          <p className="text-muted">
-            {mode === 'signup' ? 'Creá tu cuenta para empezar.' : 'Ingresá para gestionar tus catálogos.'}
-          </p>
+          <p className="text-muted">{mode === 'signup' ? t('login.signupSubtitle') : t('login.signinSubtitle')}</p>
 
           <div className="space-y-1">
-            <label htmlFor="email" className="text-sm text-muted">Email</label>
+            <label htmlFor="email" className="text-sm text-muted">{t('login.email')}</label>
             <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="password" className="text-sm text-muted">Contraseña</label>
+            <label htmlFor="password" className="text-sm text-muted">{t('login.password')}</label>
             <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
           </div>
 
@@ -135,7 +138,7 @@ export default function Login() {
             disabled={loading || needsCaptcha}
             className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? '…' : mode === 'signup' ? 'Crear cuenta' : 'Ingresar'}
+            {loading ? '…' : mode === 'signup' ? t('login.signupButton') : t('login.signinButton')}
           </button>
 
           <button
@@ -143,20 +146,10 @@ export default function Login() {
             onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
             className="w-full text-center text-sm text-faint hover:text-fg"
           >
-            {mode === 'signup' ? '¿Ya tenés cuenta? Ingresá' : '¿No tenés cuenta? Registrate'}
+            {mode === 'signup' ? t('login.toSignin') : t('login.toSignup')}
           </button>
 
-          <p className="text-center text-xs text-faint">
-            Al continuar, aceptás los{' '}
-            <Link to="/terminos" className="text-link hover:underline">
-              Términos y condiciones
-            </Link>{' '}
-            y la{' '}
-            <Link to="/privacidad" className="text-link hover:underline">
-              Política de privacidad
-            </Link>
-            .
-          </p>
+          {acceptanceLine}
         </form>
       )}
     </div>

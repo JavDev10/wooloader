@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type ConfirmButtonProps = {
   onConfirm: () => void | Promise<void>
@@ -13,11 +14,12 @@ type ConfirmButtonProps = {
 export function ConfirmButton({
   onConfirm,
   label,
-  confirmLabel = '¿Seguro? Confirmar',
+  confirmLabel,
   icon,
   className = '',
   confirmClassName = '',
 }: ConfirmButtonProps) {
+  const { t } = useTranslation()
   const [confirming, setConfirming] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -42,7 +44,7 @@ export function ConfirmButton({
   return (
     <button type="button" onClick={handleClick} className={confirming ? confirmClassName : className}>
       {!confirming && icon}
-      {confirming ? confirmLabel : label}
+      {confirming ? (confirmLabel ?? t('common.confirmSure')) : label}
     </button>
   )
 }

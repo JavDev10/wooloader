@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ImagePlus, Trash2 } from 'lucide-react'
 import { inputClass } from '@/components/ui/Field'
 import { PriceInput } from '@/components/ui/PriceInput'
@@ -10,13 +11,15 @@ import type { Variant } from '@/lib/types'
 import type { StepProps } from '@/routes/app/steps/types'
 
 export default function VariantGrid({ product, onChange, userId, catalogId, weightUnit }: StepProps) {
+  const { t } = useTranslation()
+
   function updateVariant(id: string, patch: Partial<Variant>) {
     onChange({
       variants: product.variants.map((v) => (v.id === id ? { ...v, ...patch } : v)),
     })
   }
 
-  // Copies the product's own weight/dimensions (entered in "Datos básicos")
+  // Copies the product's own weight/dimensions (entered in the basic step)
   // into every variant, so you don't have to retype them row by row when the
   // variants share the base product's measurements.
   function applyProductPhysicalToAll() {
@@ -50,7 +53,7 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
   }
 
   if (product.variants.length === 0) {
-    return <p className="text-sm text-faint">Agregá al menos un valor a cada atributo para generar variantes.</p>
+    return <p className="text-sm text-faint">{t('variants.empty')}</p>
   }
 
   const visibleVariants = product.variants.filter((v) => !v.excluded)
@@ -61,16 +64,14 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
     // the side ad gutters); the table scrolls horizontally when it needs more room.
     <div className="w-full">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-faint">
-          Peso y dimensiones son opcionales — dejalos vacíos si la variante pesa/mide igual que el resto del producto.
-        </p>
+        <p className="text-xs text-faint">{t('variants.physicalHint')}</p>
         {hasProductPhysical && (
           <button
             type="button"
             onClick={applyProductPhysicalToAll}
             className="whitespace-nowrap rounded-md border border-line px-3 py-1.5 text-xs font-medium text-muted hover:bg-elevated hover:text-fg"
           >
-            Usar el peso y dimensiones del producto en todas
+            {t('variants.applyProductPhysical')}
           </button>
         )}
       </div>
@@ -78,14 +79,14 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
       <table className="w-full min-w-[880px] border-separate border-spacing-y-2 text-sm">
         <thead>
           <tr className="text-left text-faint">
-            <th className="px-2 font-normal">Combinación</th>
-            <th className="px-2 font-normal">Precio</th>
-            <th className="px-2 font-normal">Oferta</th>
-            <th className="px-2 font-normal">Stock</th>
-            <th className="px-2 font-normal">SKU</th>
-            <th className="px-2 font-normal">Peso ({weightUnit})</th>
-            <th className="px-2 font-normal">Dimensiones (cm)</th>
-            <th className="px-2 font-normal">Imagen</th>
+            <th className="px-2 font-normal">{t('variants.combination')}</th>
+            <th className="px-2 font-normal">{t('variants.price')}</th>
+            <th className="px-2 font-normal">{t('variants.sale')}</th>
+            <th className="px-2 font-normal">{t('variants.stock')}</th>
+            <th className="px-2 font-normal">{t('variants.sku')}</th>
+            <th className="px-2 font-normal">{t('variants.weight', { unit: weightUnit })}</th>
+            <th className="px-2 font-normal">{t('variants.dimensions')}</th>
+            <th className="px-2 font-normal">{t('variants.image')}</th>
             <th className="px-2 font-normal"></th>
           </tr>
         </thead>
@@ -103,11 +104,7 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
       </table>
       </div>
 
-      {visibleVariants.length === 0 && (
-        <p className="mt-2 text-sm text-faint">
-          Eliminaste todas las variantes de este producto.
-        </p>
-      )}
+      {visibleVariants.length === 0 && <p className="mt-2 text-sm text-faint">{t('variants.allDeleted')}</p>}
 
       {hiddenCount > 0 && (
         <button
@@ -115,7 +112,7 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
           onClick={restoreAll}
           className="mt-2 text-xs text-faint underline hover:text-fg"
         >
-          Restaurar {hiddenCount} variante{hiddenCount === 1 ? '' : 's'} eliminada{hiddenCount === 1 ? '' : 's'}
+          {t('variants.restore', { count: hiddenCount })}
         </button>
       )}
     </div>
@@ -133,6 +130,7 @@ function VariantRow({
   onUploadImage: (file: File) => void
   onDelete: () => void
 }) {
+  const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
@@ -185,7 +183,7 @@ function VariantRow({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="flex items-center gap-1 text-muted hover:text-link"
-          aria-label="Subir imagen de la variante"
+          aria-label={t('variants.uploadImage')}
         >
           {variant.image_url ? (
             <img src={variant.image_url} alt="" className="h-8 w-8 rounded object-cover" />
@@ -199,7 +197,7 @@ function VariantRow({
           type="button"
           onClick={onDelete}
           className="text-faint hover:text-red-400"
-          aria-label="Eliminar variante"
+          aria-label={t('variants.deleteVariant')}
         >
           <Trash2 size={16} />
         </button>

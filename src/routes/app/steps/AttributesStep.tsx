@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Plus, X } from 'lucide-react'
 import { inputClass } from '@/components/ui/Field'
 import { reconcileVariants } from '@/lib/variantCombinations'
@@ -8,6 +9,7 @@ import VariantGrid from '@/routes/app/steps/VariantGrid'
 
 export default function AttributesStep(props: StepProps) {
   const { product, onChange } = props
+  const { t } = useTranslation()
   const [newAttrName, setNewAttrName] = useState('')
   const [valueDrafts, setValueDrafts] = useState<Record<number, string>>({})
 
@@ -71,16 +73,12 @@ export default function AttributesStep(props: StepProps) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted">
-        Agregá un atributo (ej. "Color") y sus valores (ej. negro, azul, rojo). Si cargás 2 o más
-        atributos, generamos automáticamente todas las combinaciones para que definas precio y stock
-        de cada una.
-      </p>
+      <p className="text-sm text-muted">{t('attributes.intro')}</p>
 
       <div className="flex gap-2">
         <input
           className={inputClass}
-          placeholder='Nombre del atributo, ej. "Color"'
+          placeholder={t('attributes.namePlaceholder')}
           value={newAttrName}
           onChange={(e) => setNewAttrName(e.target.value)}
           onKeyDown={handleAttrNameKeyDown}
@@ -90,7 +88,7 @@ export default function AttributesStep(props: StepProps) {
           onClick={addAttribute}
           className="flex items-center gap-1 whitespace-nowrap rounded-md border border-line bg-surface px-3 py-2 text-sm font-medium hover:bg-elevated"
         >
-          <Plus size={16} /> Agregar
+          <Plus size={16} /> {t('attributes.add')}
         </button>
       </div>
 
@@ -102,7 +100,7 @@ export default function AttributesStep(props: StepProps) {
               type="button"
               onClick={() => removeAttribute(i)}
               className="text-faint hover:text-red-400"
-              aria-label={`Eliminar atributo ${attr.name}`}
+              aria-label={t('attributes.removeAttribute', { name: attr.name })}
             >
               <X size={16} />
             </button>
@@ -121,7 +119,7 @@ export default function AttributesStep(props: StepProps) {
 
           <input
             className={`${inputClass} text-sm`}
-            placeholder="Agregar valor y Enter"
+            placeholder={t('attributes.valuePlaceholder')}
             value={valueDrafts[i] ?? ''}
             onChange={(e) => setValueDrafts((d) => ({ ...d, [i]: e.target.value }))}
             onKeyDown={(e) => handleValueKeyDown(i, e)}
@@ -131,7 +129,7 @@ export default function AttributesStep(props: StepProps) {
 
       {product.attributes.length > 0 && (
         <div className="space-y-2">
-          <span className="text-sm text-muted">Variantes</span>
+          <span className="text-sm text-muted">{t('attributes.variants')}</span>
           <VariantGrid {...props} />
         </div>
       )}
