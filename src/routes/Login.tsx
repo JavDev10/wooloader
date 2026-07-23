@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { getSession, signIn, signInAnonymously, signUp } from '@/lib/api/auth'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
@@ -80,8 +80,8 @@ export default function Login() {
         <div className="w-full max-w-sm space-y-4 text-center">
           <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
           <p className="text-muted">
-            Probá WooLoader sin registrarte. Es una demo: los datos son temporales y se borran
-            automáticamente.
+            Probá WooLoader sin registrarte. Es una demo: los datos son temporales y pueden borrarse
+            en cualquier momento.
           </p>
           {CAPTCHA_ENABLED && (
             <div className="flex justify-center">
@@ -97,6 +97,17 @@ export default function Login() {
           >
             {loading ? '…' : 'Probar la demo'}
           </button>
+          <p className="text-xs text-faint">
+            Al continuar, aceptás los{' '}
+            <Link to="/terminos" className="text-link hover:underline">
+              Términos y condiciones
+            </Link>{' '}
+            y la{' '}
+            <Link to="/privacidad" className="text-link hover:underline">
+              Política de privacidad
+            </Link>
+            .
+          </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
@@ -134,6 +145,18 @@ export default function Login() {
           >
             {mode === 'signup' ? '¿Ya tenés cuenta? Ingresá' : '¿No tenés cuenta? Registrate'}
           </button>
+
+          <p className="text-center text-xs text-faint">
+            Al continuar, aceptás los{' '}
+            <Link to="/terminos" className="text-link hover:underline">
+              Términos y condiciones
+            </Link>{' '}
+            y la{' '}
+            <Link to="/privacidad" className="text-link hover:underline">
+              Política de privacidad
+            </Link>
+            .
+          </p>
         </form>
       )}
     </div>

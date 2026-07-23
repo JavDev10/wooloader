@@ -5,6 +5,8 @@ import { ConfirmDialogHost } from '@/components/ui/ConfirmDialogHost'
 import Landing from '@/routes/Landing'
 import Login from '@/routes/Login'
 import NotFound from '@/routes/NotFound'
+import Terms from '@/routes/legal/Terms'
+import Privacy from '@/routes/legal/Privacy'
 import RequireAuth from '@/routes/app/RequireAuth'
 import CatalogList from '@/routes/app/CatalogList'
 import CatalogDetail from '@/routes/app/CatalogDetail'
@@ -19,6 +21,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/terminos" element={<Terms />} />
+          <Route path="/privacidad" element={<Privacy />} />
 
           <Route path="/app" element={<RequireAuth />}>
             <Route index element={<CatalogList />} />
