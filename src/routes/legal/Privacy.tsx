@@ -68,6 +68,11 @@ export default function Privacy() {
           está activa). Cloudflare procesa datos técnicos de tu navegador para decidir si sos humano.
         </li>
         <li>
+          <strong>Cloudflare Web Analytics</strong> — métricas de tráfico agregadas de la versión
+          online (páginas vistas, país, tipo de dispositivo). No usa cookies ni identifica visitantes
+          individuales.
+        </li>
+        <li>
           <strong>Google Fonts</strong> — las tipografías se cargan desde servidores de Google, que
           recibe tu IP al servirlas.
         </li>

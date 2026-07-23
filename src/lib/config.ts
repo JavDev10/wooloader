@@ -24,3 +24,10 @@ export const CAPTCHA_ENABLED = TURNSTILE_SITE_KEY !== ''
  * file for the CSP note. Leave false for self-host.
  */
 export const ADS_ENABLED = import.meta.env.VITE_ADS_ENABLED === 'true'
+
+/**
+ * Cloudflare Web Analytics (cookieless, no consent banner needed). When the
+ * token is set, the beacon is injected at startup (src/lib/analytics.ts).
+ * Leave empty for self-host — no third-party script is loaded at all.
+ */
+export const CF_ANALYTICS_TOKEN = (import.meta.env.VITE_CF_ANALYTICS_TOKEN as string | undefined) ?? ''
