@@ -109,10 +109,15 @@ export const productSchema = z.object({
 })
 export type Product = z.infer<typeof productSchema>
 
+export const weightUnitSchema = z.enum(['kg', 'lb'])
+export type WeightUnit = z.infer<typeof weightUnitSchema>
+
 export const catalogSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
   name: z.string(),
+  // `.default('kg')` so rows saved before migration 0007 still parse.
+  weight_unit: weightUnitSchema.default('kg'),
   created_at: z.string(),
   updated_at: z.string(),
 })

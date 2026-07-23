@@ -64,7 +64,7 @@ export function mapProductToRows(product: Product): CsvRow[] {
         Images: images,
         'In stock?': inStock ? '1' : '0',
         Stock: product.stock === null ? '' : String(product.stock),
-        'Weight (kg)': product.weight != null ? String(product.weight) : '',
+        Weight: product.weight != null ? String(product.weight) : '',
         'Length (cm)': length,
         'Width (cm)': width,
         'Height (cm)': height,
@@ -96,7 +96,7 @@ export function mapProductToRows(product: Product): CsvRow[] {
     Images: images,
     'In stock?': '1',
     Stock: '',
-    'Weight (kg)': product.weight != null ? String(product.weight) : '',
+    Weight: product.weight != null ? String(product.weight) : '',
     'Length (cm)': length,
     'Width (cm)': width,
     'Height (cm)': height,
@@ -146,7 +146,7 @@ export function mapProductToRows(product: Product): CsvRow[] {
       Stock: variant.stock === null ? '' : String(variant.stock),
       // Blank means "same as the product" — WooCommerce falls back to the
       // parent's weight/dimensions for a variation that doesn't set its own.
-      'Weight (kg)': variant.weight != null ? String(variant.weight) : '',
+      Weight: variant.weight != null ? String(variant.weight) : '',
       'Length (cm)': variant.dimensions?.length != null ? String(variant.dimensions.length) : '',
       'Width (cm)': variant.dimensions?.width != null ? String(variant.dimensions.width) : '',
       'Height (cm)': variant.dimensions?.height != null ? String(variant.dimensions.height) : '',

@@ -9,6 +9,7 @@ import { deleteProduct } from '@/lib/api/products'
 import { buildCsv, downloadCsv } from '@/lib/csv/buildCsv'
 import { inputClass } from '@/components/ui/Field'
 import { useLimits } from '@/context/LimitsContext'
+import type { WeightUnit } from '@/lib/types'
 
 export default function CatalogDetail() {
   const { catalogId } = useParams<{ catalogId: string }>()
@@ -22,6 +23,7 @@ export default function CatalogDetail() {
   const removeProductLocal = useEditorStore((s) => s.removeProductLocal)
 
   const [catalogName, setCatalogName] = useState('')
+  const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg')
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const savedNameRef = useRef('')
@@ -31,6 +33,7 @@ export default function CatalogDetail() {
       getCatalog(catalogId)
         .then((c) => {
           setCatalogName(c.name)
+          setWeightUnit(c.weight_unit)
           savedNameRef.current = c.name
         })
         .catch(() => {})
@@ -89,7 +92,7 @@ export default function CatalogDetail() {
   }
 
   function handleExport() {
-    const csv = buildCsv(products)
+    const csv = buildCsv(products, { weightUnit })
     const filename = `${(catalogName || 'catalogo').replace(/\s+/g, '-').toLowerCase()}-productos.csv`
     downloadCsv(filename, csv)
   }

@@ -9,7 +9,7 @@ import { processImage } from '@/lib/imageValidation'
 import type { Variant } from '@/lib/types'
 import type { StepProps } from '@/routes/app/steps/types'
 
-export default function VariantGrid({ product, onChange, userId, catalogId }: StepProps) {
+export default function VariantGrid({ product, onChange, userId, catalogId, weightUnit }: StepProps) {
   function updateVariant(id: string, patch: Partial<Variant>) {
     onChange({
       variants: product.variants.map((v) => (v.id === id ? { ...v, ...patch } : v)),
@@ -83,7 +83,7 @@ export default function VariantGrid({ product, onChange, userId, catalogId }: St
             <th className="px-2 font-normal">Oferta</th>
             <th className="px-2 font-normal">Stock</th>
             <th className="px-2 font-normal">SKU</th>
-            <th className="px-2 font-normal">Peso (kg)</th>
+            <th className="px-2 font-normal">Peso ({weightUnit})</th>
             <th className="px-2 font-normal">Dimensiones (cm)</th>
             <th className="px-2 font-normal">Imagen</th>
             <th className="px-2 font-normal"></th>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { inputClass } from '@/components/ui/Field'
-import { clampWeight, formatWeightDisplay, parseWeightInput } from '@/lib/weightFormat'
+import { formatWeightDisplay, parseWeightInput } from '@/lib/weightFormat'
 
 type WeightInputProps = {
   id?: string
@@ -10,7 +10,7 @@ type WeightInputProps = {
   placeholder?: string
 }
 
-/** A kg weight input using a comma decimal separator, clamped to the shipping minimum on blur. See src/lib/weightFormat.ts. */
+/** A weight input using a comma decimal separator. No minimum — any positive value goes. See src/lib/weightFormat.ts. */
 export function WeightInput({ id, value, onChange, className, placeholder }: WeightInputProps) {
   const [focused, setFocused] = useState(false)
   const [rawText, setRawText] = useState(formatWeightDisplay(value))
@@ -31,10 +31,7 @@ export function WeightInput({ id, value, onChange, className, placeholder }: Wei
         setRawText(e.target.value)
         onChange(parseWeightInput(e.target.value))
       }}
-      onBlur={() => {
-        setFocused(false)
-        onChange(clampWeight(parseWeightInput(rawText)))
-      }}
+      onBlur={() => setFocused(false)}
       placeholder={placeholder}
     />
   )

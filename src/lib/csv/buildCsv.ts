@@ -1,5 +1,5 @@
 import Papa from 'papaparse'
-import type { Product } from '@/lib/types'
+import type { Product, WeightUnit } from '@/lib/types'
 import { mapProductToRows } from '@/lib/csv/mapProductToRows'
 import type { CsvRow } from '@/lib/csv/types'
 
@@ -18,12 +18,19 @@ const BASE_COLUMNS: (keyof Omit<CsvRow, 'attributes'>)[] = [
   'Images',
   'In stock?',
   'Stock',
-  'Weight (kg)',
+  'Weight',
   'Length (cm)',
   'Width (cm)',
   'Height (cm)',
   'Parent',
 ]
+
+// Serialized header for the internal Weight key, matching how WooCommerce's own
+// exporter labels the column for each store weight unit.
+const WEIGHT_HEADER: Record<WeightUnit, string> = {
+  kg: 'Weight (kg)',
+  lb: 'Weight (lbs)',
+}
 
 // A cell starting with any of these is interpreted as a formula by Excel /
 // Google Sheets / LibreOffice if the CSV is opened in a spreadsheet (CSV
@@ -42,8 +49,13 @@ export function escapeCsvValue(value: string): string {
  * serializes to a CSV string. Attribute columns are padded to the widest
  * product in the export so every row lines up under the same header run
  * (Attribute 1 name/value(s)/visible/global, Attribute 2 ..., etc).
+ * `weightUnit` (the catalog's) only changes the Weight column header — values
+ * are exported as entered.
  */
-export function buildCsv(products: Product[]): string {
+export function buildCsv(products: Product[], options: { weightUnit?: WeightUnit } = {}): string {
+  const weightHeader = WEIGHT_HEADER[options.weightUnit ?? 'kg']
+  const headerFor = (col: (typeof BASE_COLUMNS)[number]) => (col === 'Weight' ? weightHeader : col)
+
   const rows = products.flatMap(mapProductToRows)
   const maxAttributes = rows.reduce((max, row) => Math.max(max, row.attributes.length), 0)
 
@@ -57,11 +69,11 @@ export function buildCsv(products: Product[]): string {
     )
   }
 
-  const headers = [...BASE_COLUMNS, ...attributeColumns]
+  const headers = [...BASE_COLUMNS.map(headerFor), ...attributeColumns]
 
   const flatRows = rows.map((row) => {
     const flat: Record<string, string> = {}
-    for (const col of BASE_COLUMNS) flat[col] = row[col]
+    for (const col of BASE_COLUMNS) flat[headerFor(col)] = row[col]
 
     for (let n = 0; n < maxAttributes; n++) {
       const attr = row.attributes[n]
