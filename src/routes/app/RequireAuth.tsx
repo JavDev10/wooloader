@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
 import { getSession, onAuthStateChange } from '@/lib/api/auth'
 import { AppHeader } from '@/routes/app/AppHeader'
+import { AdSlot } from '@/components/ui/AdSlot'
 import { LimitsProvider } from '@/context/LimitsContext'
 
 export type AppContext = {
@@ -35,7 +36,15 @@ export default function RequireAuth() {
     <div className="min-h-screen">
       <AppHeader session={session} />
       <LimitsProvider>
-        <Outlet context={{ session, userId: session.user.id } satisfies AppContext} />
+        {/* Side gutters host the ad slots on the hosted instance (≥ xl screens).
+            With ads off the slots render nothing and this is just the content. */}
+        <div className="mx-auto flex max-w-7xl justify-center gap-4 xl:px-4">
+          <AdSlot position="left" />
+          <main className="min-w-0 flex-1">
+            <Outlet context={{ session, userId: session.user.id } satisfies AppContext} />
+          </main>
+          <AdSlot position="right" />
+        </div>
       </LimitsProvider>
     </div>
   )

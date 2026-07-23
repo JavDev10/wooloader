@@ -17,3 +17,10 @@ export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
 
 export const TURNSTILE_SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? ''
 export const CAPTCHA_ENABLED = TURNSTILE_SITE_KEY !== ''
+
+/**
+ * Shows the side ad slots in the app area (hosted instance only). The slots are
+ * placeholders until an ad network snippet is dropped into AdSlot.tsx — see that
+ * file for the CSP note. Leave false for self-host.
+ */
+export const ADS_ENABLED = import.meta.env.VITE_ADS_ENABLED === 'true'

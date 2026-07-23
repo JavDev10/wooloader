@@ -57,10 +57,9 @@ export default function VariantGrid({ product, onChange, userId, catalogId }: St
   const hiddenCount = product.variants.length - visibleVariants.length
 
   return (
-    // Breaks out wider than the rest of the form (capped at max-w-2xl) so the
-    // variant grid's many columns fit without cramping. Centered and capped at
-    // max-w-5xl; on narrow screens w-screen keeps it full width.
-    <div className="relative left-1/2 w-screen max-w-5xl -translate-x-1/2 px-6">
+    // Stays within the page container (no viewport breakout — that would overlap
+    // the side ad gutters); the table scrolls horizontally when it needs more room.
+    <div className="w-full">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-faint">
           Peso y dimensiones son opcionales — dejalos vacíos si la variante pesa/mide igual que el resto del producto.
