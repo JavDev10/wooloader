@@ -78,10 +78,9 @@ export function WooProductPreview({ product }: { product: Product }) {
   const breadcrumb = ['Tienda', product.category, product.subcategory].filter(Boolean).join(' / ')
 
   return (
-    // Breaks out wider than the editor column (capped at max-w-2xl) so the
-    // image and layout have room to breathe. Centered, capped at max-w-4xl;
-    // on narrow screens w-screen keeps it full width.
-    <div className="relative left-1/2 w-screen max-w-4xl -translate-x-1/2 px-6">
+    // Stays within the page container (no viewport breakout — that would overlap
+    // the side ad gutters). The card's internal layout is responsive.
+    <div className="w-full">
       <div className="rounded-lg bg-white p-5 text-gray-900 shadow-lg">
         <p className="mb-4 truncate text-xs text-gray-400">
           {breadcrumb} / {product.name || 'Producto'}
