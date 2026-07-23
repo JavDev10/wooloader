@@ -98,7 +98,15 @@ export default function ProductStepper() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
+      <button
+        type="button"
+        onClick={() => navigate(`/app/catalog/${catalogId}`)}
+        className="mb-4 flex items-center gap-1 text-sm text-faint transition-colors hover:text-fg"
+      >
+        <ArrowLeft size={16} /> {t('stepper.backToCatalog')}
+      </button>
+
       <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="min-w-0 flex-1 truncate font-display text-2xl font-bold">
           {product.name || t('stepper.newProduct')}
@@ -125,14 +133,17 @@ export default function ProductStepper() {
         ))}
       </div>
 
-      <StepComponent
-        product={product}
-        onChange={onChange}
-        userId={userId}
-        catalogId={catalogId!}
-        weightUnit={weightUnit}
-        onWeightUnitChange={handleWeightUnitChange}
-      />
+      {/* Keyed wrapper so each step change replays the entrance animation. */}
+      <div key={STEPS[stepIndex].key} className="motion-safe:animate-fade-up">
+        <StepComponent
+          product={product}
+          onChange={onChange}
+          userId={userId}
+          catalogId={catalogId!}
+          weightUnit={weightUnit}
+          onWeightUnitChange={handleWeightUnitChange}
+        />
+      </div>
 
       <div className="mt-10 flex justify-between">
         <button

@@ -13,7 +13,7 @@ export function LegalLayout({ title, children }: { title: string; children: Reac
   const notice = (i18n.resolvedLanguage ?? 'es').startsWith('es') ? '' : t('legal.spanishOnly')
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
       <div className="flex items-center justify-between">
         <Link to="/" className="flex items-center gap-1 text-sm text-faint hover:text-fg">
           <ArrowLeft size={16} /> {t('legal.backHome')}

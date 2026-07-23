@@ -31,6 +31,33 @@
 
   --font-display: 'Poppins', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Subtle entrance animations. Use with the motion-safe: variant so they're
+     skipped for users with prefers-reduced-motion. */
+  --animate-fade-up: fade-up 0.3s ease-out both;
+  --animate-pop: pop 0.15s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
 
 :root[data-theme='light'] {

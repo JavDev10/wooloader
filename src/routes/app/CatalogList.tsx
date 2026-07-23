@@ -49,7 +49,7 @@ export default function CatalogList() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
       <h1 className="font-display text-3xl font-bold">{t('catalogs.title')}</h1>
       <p className="mt-2 text-muted">{t('catalogs.subtitle')}</p>
       {enabled && (
@@ -86,7 +86,7 @@ export default function CatalogList() {
         {catalogs?.map((catalog) => (
           <div
             key={catalog.id}
-            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3"
+            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
           >
             <button
               type="button"

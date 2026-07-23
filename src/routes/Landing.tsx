@@ -10,7 +10,7 @@ export default function Landing() {
   const { t } = useTranslation()
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-20">
+    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up sm:py-20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-display text-lg font-bold">
           <PackagePlus size={22} className="text-accent-ink" /> WooLoader

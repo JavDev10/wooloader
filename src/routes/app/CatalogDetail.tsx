@@ -104,7 +104,7 @@ export default function CatalogDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
       <button
         type="button"
         onClick={() => navigate('/app')}
@@ -152,7 +152,7 @@ export default function CatalogDetail() {
         {products.map((product) => (
           <div
             key={product.id}
-            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3"
+            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
           >
             <button
               type="button"
