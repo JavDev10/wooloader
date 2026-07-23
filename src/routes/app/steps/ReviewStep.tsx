@@ -19,7 +19,7 @@ export default function ReviewStep({ product }: StepProps) {
         <WooProductPreview product={product} />
       </div>
 
-      <dl className="grid grid-cols-[140px_1fr] gap-y-2 rounded-md border border-line p-4">
+      <dl className="grid grid-cols-[110px_1fr] gap-x-2 gap-y-2 rounded-md border border-line p-4 sm:grid-cols-[140px_1fr]">
         <dt className="text-faint">{t('review.name')}</dt>
         <dd>{product.name || '—'}</dd>
 

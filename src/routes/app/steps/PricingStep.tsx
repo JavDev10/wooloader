@@ -26,7 +26,7 @@ export default function PricingStep({ product, onChange }: StepProps) {
           {product.attributes.length > 0 && (
             <p className="rounded-md bg-link/10 px-3 py-2 text-sm text-muted">{t('pricing.variantsNote')}</p>
           )}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t('pricing.regularPrice')} htmlFor="regular_price">
               <PriceInput id="regular_price" value={product.regular_price} onChange={(v) => onChange({ regular_price: v })} />
             </Field>
