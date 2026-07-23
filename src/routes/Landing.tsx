@@ -30,7 +30,7 @@ export default function Landing() {
           {DEMO_MODE ? 'Probar la demo' : 'Ingresar'}
         </Link>
         <a
-          href="https://github.com"
+          href="https://github.com/JavDev10/wooloader"
           className="rounded-md border border-line px-5 py-3 font-medium text-fg hover:bg-elevated"
         >
           Ver en GitHub
@@ -48,6 +48,19 @@ export default function Landing() {
           Exportá un archivo compatible con el importador de productos, sin plugins raros.
         </Feature>
       </div>
+
+      <footer className="mt-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line pt-6 text-sm text-faint">
+        <span>© {new Date().getFullYear()} WooLoader</span>
+        <Link to="/terminos" className="hover:text-fg">
+          Términos y condiciones
+        </Link>
+        <Link to="/privacidad" className="hover:text-fg">
+          Privacidad y cookies
+        </Link>
+        <a href="https://github.com/JavDev10/wooloader" className="hover:text-fg">
+          GitHub
+        </a>
+      </footer>
     </div>
   )
 }
