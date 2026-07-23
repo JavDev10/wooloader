@@ -130,10 +130,12 @@ export default function CatalogDetail() {
             setNameDraft(catalogName)
             setEditingName(true)
           }}
-          className="group flex items-center gap-2 text-left"
+          className="group flex w-full min-w-0 items-center gap-2 text-left"
         >
-          <h1 className="font-display text-3xl font-bold">{catalogName || t('catalog.fallbackName')}</h1>
-          <Pencil size={16} className="text-faint group-hover:text-muted" />
+          <h1 className="min-w-0 break-words font-display text-3xl font-bold">
+            {catalogName || t('catalog.fallbackName')}
+          </h1>
+          <Pencil size={16} className="shrink-0 text-faint group-hover:text-muted" />
         </button>
       )}
 
@@ -155,9 +157,9 @@ export default function CatalogDetail() {
             <button
               type="button"
               onClick={() => navigate(`/app/catalog/${catalogId}/product/${product.id}`)}
-              className="flex-1 text-left"
+              className="min-w-0 flex-1 text-left"
             >
-              <span className="font-medium">{product.name || t('catalog.unnamedProduct')}</span>
+              <span className="break-words font-medium">{product.name || t('catalog.unnamedProduct')}</span>
               {product.category && <span className="ml-2 text-sm text-faint">{product.category}</span>}
             </button>
             <div className="flex items-center gap-3">

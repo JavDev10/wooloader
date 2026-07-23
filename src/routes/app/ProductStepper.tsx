@@ -99,9 +99,11 @@ export default function ProductStepper() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">{product.name || t('stepper.newProduct')}</h1>
-        <span className="text-xs text-faint">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <h1 className="min-w-0 flex-1 truncate font-display text-2xl font-bold">
+          {product.name || t('stepper.newProduct')}
+        </h1>
+        <span className="shrink-0 text-xs text-faint">
           {status === 'saving' && t('stepper.saving')}
           {status === 'saved' && t('stepper.saved')}
           {status === 'error' && t('stepper.saveError')}

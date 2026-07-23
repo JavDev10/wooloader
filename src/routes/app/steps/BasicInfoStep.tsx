@@ -64,7 +64,7 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
         />
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t('basic.category')} htmlFor="category" hint={t('basic.categoryHint')}>
           <input
             id="category"
@@ -108,7 +108,7 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
 
       {!product.no_physical_dimensions && (
         <>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t('basic.weight', { unit: weightUnit })} htmlFor="weight">
               <div className="flex gap-2">
                 <input

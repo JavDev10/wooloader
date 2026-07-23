@@ -42,22 +42,24 @@ export function AppHeader({ session }: { session: Session }) {
   }
 
   return (
-    <header className="flex items-center justify-between border-b border-line px-6 py-4">
-      <Link to="/app" className="flex items-center gap-2 font-display text-lg font-bold">
+    <header className="flex items-center justify-between gap-2 border-b border-line px-4 py-4 sm:px-6">
+      <Link to="/app" className="flex shrink-0 items-center gap-2 font-display text-lg font-bold">
         <PackagePlus size={20} className="text-accent-ink" />
         WooLoader
         {DEMO_MODE && <span className="rounded bg-elevated px-1.5 py-0.5 text-[10px] font-medium text-muted">DEMO</span>}
       </Link>
 
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         <LanguageSwitcher />
         <ThemeToggle />
+        {/* The name/email editor is desktop-only — on a phone it doesn't fit and
+            it's a rarely-used affordance. */}
         {isAnon ? (
-          <span className="text-sm text-faint">{t('header.demoSession')}</span>
+          <span className="hidden text-sm text-faint sm:inline">{t('header.demoSession')}</span>
         ) : editing ? (
           <input
             autoFocus
-            className={`${inputClass} w-40 py-1 text-sm`}
+            className={`${inputClass} hidden w-40 py-1 text-sm sm:block`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={handleSave}
@@ -69,19 +71,19 @@ export function AppHeader({ session }: { session: Session }) {
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="flex items-center gap-1 text-sm text-muted hover:text-fg"
+            className="hidden min-w-0 items-center gap-1 text-sm text-muted hover:text-fg sm:flex"
           >
-            {currentName || session.user.email}
-            <Pencil size={12} className="text-faint" />
+            <span className="max-w-[14rem] truncate">{currentName || session.user.email}</span>
+            <Pencil size={12} className="shrink-0 text-faint" />
           </button>
         )}
 
         <button
           type="button"
           onClick={() => signOut()}
-          className="flex items-center gap-1 text-sm text-faint hover:text-red-400"
+          className="flex shrink-0 items-center gap-1 text-sm text-faint hover:text-red-400"
         >
-          <LogOut size={14} /> {t('header.signOut')}
+          <LogOut size={14} /> <span className="hidden sm:inline">{t('header.signOut')}</span>
         </button>
       </div>
     </header>

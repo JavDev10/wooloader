@@ -10,7 +10,7 @@ export default function Landing() {
   const { t } = useTranslation()
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20">
+    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-display text-lg font-bold">
           <PackagePlus size={22} className="text-accent-ink" /> WooLoader
@@ -21,7 +21,7 @@ export default function Landing() {
         </div>
       </div>
 
-      <h1 className="mt-10 font-display text-4xl font-bold leading-tight sm:text-5xl">
+      <h1 className="mt-10 font-display text-3xl font-bold leading-tight sm:text-5xl">
         {t('landing.headline')}
       </h1>
       <p className="mt-4 max-w-xl text-lg text-muted">{t('landing.subtitle')}</p>

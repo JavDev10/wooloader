@@ -77,7 +77,7 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
       </div>
 
       {product.images.length > 0 && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
           {product.images.map((img) => (
             <div key={img.storage_path} className="group relative">
               <img src={img.url} alt="" className="aspect-square w-full rounded-md object-cover" />
