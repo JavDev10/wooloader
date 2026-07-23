@@ -160,7 +160,7 @@ describe('mapProductToRows — variable products', () => {
     product.variants[0].weight = 14.4
     product.variants[0].dimensions = { length: 100, width: 60, height: 75 }
     const rows = mapProductToRows(product)
-    expect(rows[1]['Weight (kg)']).toBe('14.4')
+    expect(rows[1].Weight).toBe('14.4')
     expect(rows[1]['Length (cm)']).toBe('100')
     expect(rows[1]['Width (cm)']).toBe('60')
     expect(rows[1]['Height (cm)']).toBe('75')
@@ -168,7 +168,7 @@ describe('mapProductToRows — variable products', () => {
 
   it('leaves weight/dimensions blank on a variation with none of its own (falls back to the product in WooCommerce)', () => {
     const rows = mapProductToRows(variableProduct())
-    expect(rows[1]['Weight (kg)']).toBe('')
+    expect(rows[1].Weight).toBe('')
     expect(rows[1]['Length (cm)']).toBe('')
   })
 
@@ -205,6 +205,15 @@ describe('buildCsv', () => {
     const csv = buildCsv([simpleProduct()])
     const [headerLine] = csv.trim().split('\n')
     expect(headerLine).not.toContain('Attribute 1 name')
+  })
+
+  it('labels the weight column per the catalog weight unit', () => {
+    const [kgHeader] = buildCsv([simpleProduct()]).split('\n')
+    expect(kgHeader).toContain('Weight (kg)')
+
+    const [lbHeader] = buildCsv([simpleProduct()], { weightUnit: 'lb' }).split('\n')
+    expect(lbHeader).toContain('Weight (lbs)')
+    expect(lbHeader).not.toContain('Weight (kg)')
   })
 })
 

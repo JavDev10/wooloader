@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { toast } from 'sonner'
 import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useEditorStore } from '@/store/editorStore'
 import { useLimits } from '@/context/LimitsContext'
+import { getCatalog, setCatalogWeightUnit } from '@/lib/api/catalogs'
 import type { AppContext } from '@/routes/app/RequireAuth'
-import type { Product } from '@/lib/types'
+import type { Product, WeightUnit } from '@/lib/types'
 import BasicInfoStep from '@/routes/app/steps/BasicInfoStep'
 import PricingStep from '@/routes/app/steps/PricingStep'
 import AttributesStep from '@/routes/app/steps/AttributesStep'
@@ -32,9 +34,22 @@ export default function ProductStepper() {
   const addProduct = useEditorStore((s) => s.addProduct)
   const updateProduct = useEditorStore((s) => s.updateProduct)
   const [stepIndex, setStepIndex] = useState(0)
+  const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg')
 
   const product = products.find((p) => p.id === productId)
   const status = useAutosave(product)
+
+  useEffect(() => {
+    if (catalogId) getCatalog(catalogId).then((c) => setWeightUnit(c.weight_unit)).catch(() => {})
+  }, [catalogId])
+
+  function handleWeightUnitChange(unit: WeightUnit) {
+    setWeightUnit(unit)
+    setCatalogWeightUnit(catalogId!, unit).catch(() => {
+      toast.error('No se pudo cambiar la unidad de peso.')
+      setWeightUnit(weightUnit)
+    })
+  }
 
   useEffect(() => {
     if (productId !== 'new' || loading) return
@@ -106,7 +121,14 @@ export default function ProductStepper() {
         ))}
       </div>
 
-      <StepComponent product={product} onChange={onChange} userId={userId} catalogId={catalogId!} />
+      <StepComponent
+        product={product}
+        onChange={onChange}
+        userId={userId}
+        catalogId={catalogId!}
+        weightUnit={weightUnit}
+        onWeightUnitChange={handleWeightUnitChange}
+      />
 
       <div className="mt-10 flex justify-between">
         <button

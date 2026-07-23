@@ -24,7 +24,9 @@ export type CsvRow = {
   // No "Manage stock?" column — it isn't a real WooCommerce CSV importer
   // field. WooCommerce infers manage_stock from whether Stock is present.
   Stock: string
-  'Weight (kg)': string
+  // Internal key; serialized as "Weight (kg)" or "Weight (lbs)" depending on
+  // the catalog's weight unit (see buildCsv).
+  Weight: string
   'Length (cm)': string
   'Width (cm)': string
   'Height (cm)': string

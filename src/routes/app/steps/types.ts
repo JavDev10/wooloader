@@ -1,4 +1,4 @@
-import type { Product } from '@/lib/types'
+import type { Product, WeightUnit } from '@/lib/types'
 
 export type StepProps = {
   product: Product
@@ -7,4 +7,8 @@ export type StepProps = {
   userId: string
   /** Catalog these products belong to — second segment of the image storage path. */
   catalogId: string
+  /** The catalog's weight unit — drives the weight labels and the CSV header. */
+  weightUnit: WeightUnit
+  /** Persists a new weight unit on the catalog (values are not converted). */
+  onWeightUnitChange: (unit: WeightUnit) => void
 }

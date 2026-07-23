@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { Field, inputClass } from '@/components/ui/Field'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { useCategorySuggestions, useSubcategorySuggestions } from '@/hooks/useCategorySuggestions'
-import { clampWeight, formatWeightDisplay, MIN_WEIGHT_KG, parseWeightInput } from '@/lib/weightFormat'
+import { formatWeightDisplay, parseWeightInput } from '@/lib/weightFormat'
+import type { WeightUnit } from '@/lib/types'
 import type { StepProps } from '@/routes/app/steps/types'
 
-export default function BasicInfoStep({ product, onChange }: StepProps) {
+const WEIGHT_UNITS: WeightUnit[] = ['kg', 'lb']
+
+export default function BasicInfoStep({ product, onChange, weightUnit, onWeightUnitChange }: StepProps) {
   const categories = useCategorySuggestions()
   const subcategories = useSubcategorySuggestions(product.category)
   const [weightFocused, setWeightFocused] = useState(false)
@@ -108,28 +111,40 @@ export default function BasicInfoStep({ product, onChange }: StepProps) {
       {!product.no_physical_dimensions && (
         <>
           <div className="grid grid-cols-2 gap-4">
-            <Field
-              label="Peso (kg)"
-              htmlFor="weight"
-              hint={`Mínimo ${formatWeightDisplay(MIN_WEIGHT_KG)}kg`}
-            >
-              <input
-                id="weight"
-                type="text"
-                inputMode="decimal"
-                className={inputClass}
-                value={weightFocused ? weightText : formatWeightDisplay(product.weight)}
-                onFocus={() => setWeightFocused(true)}
-                onChange={(e) => {
-                  setWeightText(e.target.value)
-                  onChange({ weight: parseWeightInput(e.target.value) })
-                }}
-                onBlur={() => {
-                  setWeightFocused(false)
-                  onChange({ weight: clampWeight(parseWeightInput(weightText)) })
-                }}
-                placeholder={formatWeightDisplay(MIN_WEIGHT_KG)}
-              />
+            <Field label={`Peso (${weightUnit})`} htmlFor="weight">
+              <div className="flex gap-2">
+                <input
+                  id="weight"
+                  type="text"
+                  inputMode="decimal"
+                  className={inputClass}
+                  value={weightFocused ? weightText : formatWeightDisplay(product.weight)}
+                  onFocus={() => setWeightFocused(true)}
+                  onChange={(e) => {
+                    setWeightText(e.target.value)
+                    onChange({ weight: parseWeightInput(e.target.value) })
+                  }}
+                  onBlur={() => setWeightFocused(false)}
+                  placeholder="0"
+                />
+                <div className="flex shrink-0 overflow-hidden rounded-md border border-line" role="group" aria-label="Unidad de peso">
+                  {WEIGHT_UNITS.map((unit) => (
+                    <button
+                      key={unit}
+                      type="button"
+                      onClick={() => onWeightUnitChange(unit)}
+                      className={
+                        unit === weightUnit
+                          ? 'bg-accent px-3 text-sm font-semibold text-on-accent'
+                          : 'bg-surface px-3 text-sm text-muted hover:bg-elevated'
+                      }
+                      aria-pressed={unit === weightUnit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </Field>
           </div>
 

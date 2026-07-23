@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
-import { catalogSchema, type Catalog } from '@/lib/types'
+import { catalogSchema, type Catalog, type WeightUnit } from '@/lib/types'
 
 /**
  * Catalog CRUD for the signed-in user. All access is direct table access,
@@ -35,6 +35,12 @@ export async function createCatalog(name: string): Promise<Catalog> {
 
 export async function renameCatalog(id: string, name: string): Promise<void> {
   const { error } = await supabase.from('catalogs').update({ name }).eq('id', id)
+  if (error) throw error
+}
+
+/** Sets the catalog's weight unit (labels + CSV header only — stored values are not converted). */
+export async function setCatalogWeightUnit(id: string, unit: WeightUnit): Promise<void> {
+  const { error } = await supabase.from('catalogs').update({ weight_unit: unit }).eq('id', id)
   if (error) throw error
 }
 

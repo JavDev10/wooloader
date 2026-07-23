@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clampWeight, formatWeightDisplay, MIN_WEIGHT_KG, parseWeightInput } from '@/lib/weightFormat'
+import { formatWeightDisplay, parseWeightInput } from '@/lib/weightFormat'
 
 describe('parseWeightInput', () => {
   it('parses a comma decimal', () => {
@@ -11,27 +11,17 @@ describe('parseWeightInput', () => {
     expect(parseWeightInput('14.4')).toBe(14.4)
   })
 
+  it('accepts small values — there is no minimum weight', () => {
+    expect(parseWeightInput('0,1')).toBe(0.1)
+    expect(parseWeightInput('0.05')).toBe(0.05)
+  })
+
   it('returns null for an empty string', () => {
     expect(parseWeightInput('')).toBeNull()
   })
 
   it('returns null for just a separator', () => {
     expect(parseWeightInput(',')).toBeNull()
-  })
-})
-
-describe('clampWeight', () => {
-  it('leaves values at or above the minimum untouched', () => {
-    expect(clampWeight(14.4)).toBe(14.4)
-    expect(clampWeight(MIN_WEIGHT_KG)).toBe(MIN_WEIGHT_KG)
-  })
-
-  it('raises values below the minimum up to it', () => {
-    expect(clampWeight(0.1)).toBe(MIN_WEIGHT_KG)
-  })
-
-  it('passes null through', () => {
-    expect(clampWeight(null)).toBeNull()
   })
 })
 
