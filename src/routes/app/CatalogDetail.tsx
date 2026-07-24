@@ -10,6 +10,7 @@ import { deleteProduct } from '@/lib/api/products'
 import { buildCsv, downloadCsv } from '@/lib/csv/buildCsv'
 import { inputClass } from '@/components/ui/Field'
 import { useLimits } from '@/context/LimitsContext'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import type { WeightUnit } from '@/lib/types'
 
 export default function CatalogDetail() {
@@ -29,6 +30,8 @@ export default function CatalogDetail() {
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const savedNameRef = useRef('')
+
+  usePageTitle(catalogName ? `${catalogName} · WooLoader` : t('seo.catalogs'))
 
   useEffect(() => {
     if (catalogId)

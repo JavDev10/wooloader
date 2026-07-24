@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { PackagePlus, Upload, Table2, Layers } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { DEMO_MODE } from '@/lib/config'
 
 export default function Landing() {
   const { t } = useTranslation()
+  usePageTitle(t('seo.home'))
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up sm:py-20">

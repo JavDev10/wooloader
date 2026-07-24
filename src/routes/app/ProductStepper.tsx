@@ -7,6 +7,7 @@ import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useEditorStore } from '@/store/editorStore'
 import { useLimits } from '@/context/LimitsContext'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { getCatalog, setCatalogWeightUnit } from '@/lib/api/catalogs'
 import type { AppContext } from '@/routes/app/RequireAuth'
 import type { Product, WeightUnit } from '@/lib/types'
@@ -40,6 +41,8 @@ export default function ProductStepper() {
 
   const product = products.find((p) => p.id === productId)
   const status = useAutosave(product)
+
+  usePageTitle(product?.name ? `${product.name} · WooLoader` : `${t('stepper.newProduct')} · WooLoader`)
 
   useEffect(() => {
     if (catalogId) getCatalog(catalogId).then((c) => setWeightUnit(c.weight_unit)).catch(() => {})

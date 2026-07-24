@@ -7,11 +7,13 @@ import { createCatalog, deleteCatalogCompletely, listCatalogs } from '@/lib/api/
 import { ConfirmButton } from '@/components/ui/ConfirmButton'
 import { inputClass } from '@/components/ui/Field'
 import { useLimits } from '@/context/LimitsContext'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import type { Catalog } from '@/lib/types'
 import type { AppContext } from '@/routes/app/RequireAuth'
 
 export default function CatalogList() {
   const { t } = useTranslation()
+  usePageTitle(t('seo.catalogs'))
   const { userId } = useOutletContext<AppContext>()
   const navigate = useNavigate()
   const { enabled, maxCatalogs, catalogCount, atCatalogLimit, bumpCatalogs } = useLimits()

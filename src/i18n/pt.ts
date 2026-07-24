@@ -225,4 +225,12 @@ export default {
     backHome: 'Voltar ao início',
     spanishOnly: 'A versão juridicamente vinculante deste documento é a em espanhol.',
   },
+  seo: {
+    home: 'WooLoader — Importador em massa de produtos para WooCommerce',
+    login: 'Entrar · WooLoader',
+    catalogs: 'Seus catálogos · WooLoader',
+    terms: 'Termos e condições · WooLoader',
+    privacy: 'Política de privacidade e cookies · WooLoader',
+    notFound: 'Página não encontrada · WooLoader',
+  },
 }
