@@ -46,6 +46,9 @@ export default {
     terms: 'Términos y condiciones',
     acceptMiddle: 'y la',
     privacy: 'Política de privacidad',
+    or: 'o',
+    google: 'Continuar con Google',
+    googleError: 'No se pudo iniciar sesión con Google.',
   },
   header: {
     demoSession: 'Sesión de prueba',
@@ -227,6 +230,11 @@ export default {
   },
   // Document titles per route (the static <title> in index.html covers the
   // first paint / crawlers; these keep the tab accurate as you navigate).
+  authCallback: {
+    signingIn: 'Completando el inicio de sesión…',
+    failed: 'No pudimos completar el inicio de sesión.',
+    backToLogin: 'Volver a ingresar',
+  },
   seo: {
     home: 'WooLoader — Importador masivo de productos para WooCommerce',
     login: 'Ingresar · WooLoader',

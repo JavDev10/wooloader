@@ -46,6 +46,9 @@ export default {
     terms: 'Terms and conditions',
     acceptMiddle: 'and the',
     privacy: 'Privacy policy',
+    or: 'or',
+    google: 'Continue with Google',
+    googleError: 'Could not sign in with Google.',
   },
   header: {
     demoSession: 'Trial session',
@@ -224,6 +227,11 @@ export default {
   legal: {
     backHome: 'Back to home',
     spanishOnly: 'The legally binding version of this document is the Spanish one.',
+  },
+  authCallback: {
+    signingIn: 'Completing sign-in…',
+    failed: "We couldn't complete the sign-in.",
+    backToLogin: 'Back to sign in',
   },
   seo: {
     home: 'WooLoader — Bulk product importer for WooCommerce',

@@ -46,6 +46,9 @@ export default {
     terms: 'Termos e condições',
     acceptMiddle: 'e a',
     privacy: 'Política de privacidade',
+    or: 'ou',
+    google: 'Continuar com o Google',
+    googleError: 'Não foi possível entrar com o Google.',
   },
   header: {
     demoSession: 'Sessão de teste',
@@ -224,6 +227,11 @@ export default {
   legal: {
     backHome: 'Voltar ao início',
     spanishOnly: 'A versão juridicamente vinculante deste documento é a em espanhol.',
+  },
+  authCallback: {
+    signingIn: 'Concluindo o login…',
+    failed: 'Não foi possível concluir o login.',
+    backToLogin: 'Voltar para entrar',
   },
   seo: {
     home: 'WooLoader — Importador em massa de produtos para WooCommerce',

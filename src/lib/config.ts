@@ -31,3 +31,11 @@ export const ADS_ENABLED = import.meta.env.VITE_ADS_ENABLED === 'true'
  * Leave empty for self-host — no third-party script is loaded at all.
  */
 export const CF_ANALYTICS_TOKEN = (import.meta.env.VITE_CF_ANALYTICS_TOKEN as string | undefined) ?? ''
+
+/**
+ * Shows the "continue with Google" button on the login page. Requires the
+ * Google provider configured in Supabase (Authentication → Providers), which is
+ * where the client ID/secret live — nothing secret is needed here. Off by
+ * default so a self-hosted install without Google credentials is unaffected.
+ */
+export const GOOGLE_AUTH_ENABLED = import.meta.env.VITE_GOOGLE_AUTH_ENABLED === 'true'
