@@ -5,12 +5,14 @@ import { getSession, signIn, signInAnonymously, signUp } from '@/lib/api/auth'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { CAPTCHA_ENABLED, DEMO_MODE } from '@/lib/config'
 
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
 
 export default function Login() {
   const { t } = useTranslation()
+  usePageTitle(t('seo.login'))
   const navigate = useNavigate()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')

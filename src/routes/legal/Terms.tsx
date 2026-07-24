@@ -1,7 +1,11 @@
+import { useTranslation } from 'react-i18next'
 import { LegalLayout } from '@/routes/legal/LegalLayout'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { CONTACT_EMAIL, LEGAL_LAST_UPDATED, REPO_URL } from '@/routes/legal/legalMeta'
 
 export default function Terms() {
+  const { t } = useTranslation()
+  usePageTitle(t('seo.terms'))
   return (
     <LegalLayout title="Términos y condiciones">
       <p className="text-sm text-faint">Última actualización: {LEGAL_LAST_UPDATED}</p>

@@ -225,4 +225,14 @@ export default {
     backHome: 'Volver al inicio',
     spanishOnly: '',
   },
+  // Document titles per route (the static <title> in index.html covers the
+  // first paint / crawlers; these keep the tab accurate as you navigate).
+  seo: {
+    home: 'WooLoader — Importador masivo de productos para WooCommerce',
+    login: 'Ingresar · WooLoader',
+    catalogs: 'Tus catálogos · WooLoader',
+    terms: 'Términos y condiciones · WooLoader',
+    privacy: 'Política de privacidad y cookies · WooLoader',
+    notFound: 'Página no encontrada · WooLoader',
+  },
 }

@@ -225,4 +225,12 @@ export default {
     backHome: 'Back to home',
     spanishOnly: 'The legally binding version of this document is the Spanish one.',
   },
+  seo: {
+    home: 'WooLoader — Bulk product importer for WooCommerce',
+    login: 'Sign in · WooLoader',
+    catalogs: 'Your catalogs · WooLoader',
+    terms: 'Terms and conditions · WooLoader',
+    privacy: 'Privacy and cookies policy · WooLoader',
+    notFound: 'Page not found · WooLoader',
+  },
 }

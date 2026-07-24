@@ -1,10 +1,67 @@
 <!doctype html>
-<html lang="en">
+<!-- lang matches the default/fallback language; src/i18n updates it at runtime
+     once a language is detected or chosen. -->
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WooLoader — Bulk product importer for WooCommerce</title>
+
+    <title>WooLoader — Importador masivo de productos para WooCommerce</title>
+    <meta
+      name="description"
+      content="Carga tu catálogo con una interfaz visual y expórtalo como CSV para el importador nativo de WooCommerce. Variantes, imágenes y precios. Código abierto y gratis."
+    />
+    <!-- __SITE_URL__ is replaced at build time by scripts/generate-seo-files.mjs
+         (from VITE_SITE_URL, or Netlify's URL). Left empty when unknown, which
+         degrades these to relative URLs rather than pointing at a wrong domain. -->
+    <link rel="canonical" href="__SITE_URL__/" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+    <!-- Open Graph (link previews on WhatsApp, LinkedIn, Facebook…) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="WooLoader" />
+    <meta property="og:title" content="WooLoader — Importador masivo de productos para WooCommerce" />
+    <meta
+      property="og:description"
+      content="Carga tu catálogo con una interfaz visual y expórtalo como CSV para el importador nativo de WooCommerce. Código abierto y gratis."
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:image" content="__SITE_URL__/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="WooLoader — importador masivo de productos para WooCommerce" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+
+    <!-- Twitter/X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WooLoader — Importador masivo de productos para WooCommerce" />
+    <meta
+      name="twitter:description"
+      content="Carga tu catálogo con una interfaz visual y expórtalo como CSV para el importador nativo de WooCommerce."
+    />
+    <meta name="twitter:image" content="__SITE_URL__/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "WooLoader",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "url": "__SITE_URL__/",
+        "description": "Importador masivo de productos para WooCommerce: arma tu catálogo con una interfaz visual y expórtalo como CSV compatible con el importador nativo.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": true
+      }
+    </script>
+
     <script src="/theme-init.js"></script>
   </head>
   <body>

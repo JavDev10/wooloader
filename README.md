@@ -75,10 +75,25 @@ On a normal self-hosted install leave `limits_enabled = false` (the default) —
 the app fails open if `app_config` isn't reachable. Migration `0004` also restricts the
 `product-images` bucket to image types under 3 MB.
 
+### SEO
+
+`index.html` carries the title/description, Open Graph and Twitter cards, canonical link and
+`SoftwareApplication` structured data. After `vite build`, `scripts/generate-seo-files.mjs` fills in
+the absolute site URL and writes `robots.txt` (the private `/app` area is disallowed) and
+`sitemap.xml` for the public routes.
+
+The site URL comes from `VITE_SITE_URL`, falling back to Netlify's own `URL` variable — which
+already points at the custom domain once one is attached, so **switching to a custom domain needs no
+code change**. Without either (e.g. a local build) the tags degrade to relative URLs and the sitemap
+is skipped, rather than pointing at the wrong domain.
+
+The link-preview image is `public/og-image.png` (1200×630). Submit the sitemap in Google Search
+Console once the domain is live.
+
 ## Scripts
 
 - `npm run dev` — dev server
-- `npm run build` — production build to `dist/`
+- `npm run build` — production build to `dist/` (also generates robots.txt/sitemap.xml)
 - `npm run test` — run the test suite (Vitest)
 - `npm run lint` — lint (oxlint)
 
