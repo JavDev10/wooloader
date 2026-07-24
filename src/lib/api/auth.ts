@@ -28,6 +28,23 @@ export async function signUp(email: string, password: string, captchaToken?: str
   if (error) throw error
 }
 
+/**
+ * Google OAuth via a full-page redirect (not a popup): the browser leaves for
+ * Google's consent screen and comes back to /auth/callback, where Supabase
+ * turns the URL fragment into a session. A redirect keeps the strict CSP
+ * untouched — an embedded Google widget would need extra script/frame sources.
+ *
+ * Requires the Google provider configured in Supabase (Authentication →
+ * Providers → Google) with the client ID/secret from Google Cloud.
+ */
+export async function signInWithGoogle(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/auth/callback` },
+  })
+  if (error) throw error
+}
+
 /** Demo mode: visitors get a real (but anonymous) auth.uid(), so the same RLS isolates them. Requires "Allow anonymous sign-ins" enabled in the Supabase dashboard. */
 export async function signInAnonymously(captchaToken?: string): Promise<void> {
   const { error } = await supabase.auth.signInAnonymously({

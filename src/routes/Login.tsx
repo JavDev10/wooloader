@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getSession, signIn, signInAnonymously, signUp } from '@/lib/api/auth'
+import { getSession, signIn, signInAnonymously, signInWithGoogle, signUp } from '@/lib/api/auth'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
+import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { CAPTCHA_ENABLED, DEMO_MODE } from '@/lib/config'
+import { CAPTCHA_ENABLED, DEMO_MODE, GOOGLE_AUTH_ENABLED } from '@/lib/config'
 
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
 
@@ -55,6 +56,18 @@ export default function Login() {
       setError(mode === 'signup' ? t('login.signupError') : t('login.signinError'))
       resetCaptcha()
     } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleGoogle() {
+    setError(null)
+    setLoading(true)
+    try {
+      // Redirects away to Google; on success the browser lands on /auth/callback.
+      await signInWithGoogle()
+    } catch {
+      setError(t('login.googleError'))
       setLoading(false)
     }
   }
@@ -150,6 +163,15 @@ export default function Login() {
           >
             {mode === 'signup' ? t('login.toSignin') : t('login.toSignup')}
           </button>
+
+          {GOOGLE_AUTH_ENABLED && (
+            <>
+              <div className="flex items-center gap-3 text-xs text-faint">
+                <span className="h-px flex-1 bg-line" /> {t('login.or')} <span className="h-px flex-1 bg-line" />
+              </div>
+              <GoogleSignInButton onClick={handleGoogle} disabled={loading} />
+            </>
+          )}
 
           {acceptanceLine}
         </form>

@@ -4,6 +4,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ConfirmDialogHost } from '@/components/ui/ConfirmDialogHost'
 import Landing from '@/routes/Landing'
 import Login from '@/routes/Login'
+import AuthCallback from '@/routes/AuthCallback'
 import NotFound from '@/routes/NotFound'
 import Terms from '@/routes/legal/Terms'
 import Privacy from '@/routes/legal/Privacy'
@@ -21,6 +22,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/terminos" element={<Terms />} />
           <Route path="/privacidad" element={<Privacy />} />
 
