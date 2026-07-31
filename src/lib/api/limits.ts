@@ -7,18 +7,19 @@ import { supabase } from '@/lib/supabaseClient'
  * the "add" actions once you're at the cap.
  */
 
-export type Limits = { enabled: boolean; maxProducts: number; maxCatalogs: number }
+export type Limits = { enabled: boolean; maxProducts: number; maxCatalogs: number; maxImages: number }
 
 export async function getLimits(): Promise<Limits> {
   const { data, error } = await supabase
     .from('app_config')
-    .select('limits_enabled, max_products_per_user, max_catalogs_per_user')
+    .select('limits_enabled, max_products_per_user, max_catalogs_per_user, max_images_per_product')
     .single()
   if (error) throw error
   return {
     enabled: data.limits_enabled,
     maxProducts: data.max_products_per_user,
     maxCatalogs: data.max_catalogs_per_user,
+    maxImages: data.max_images_per_product,
   }
 }
 

@@ -1,21 +1,39 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
 import { deleteProductImage, uploadProductImage } from '@/lib/api/storage'
 import { processImage, SQUARE_IMAGE_SIZE } from '@/lib/imageValidation'
+import { useLimits } from '@/context/LimitsContext'
 import type { StepProps } from '@/routes/app/steps/types'
 
 export default function ImagesStep({ product, onChange, userId, catalogId }: StepProps) {
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
+  // Per-product image cap (hosted demo). `maxImages` is Infinity when limits are
+  // off (self-host), so the math below is a no-op there. The DB trigger from
+  // migration 0008 is the real enforcement; this is the UX for it.
+  const { enabled: limitsEnabled, maxImages } = useLimits()
+  const remaining = maxImages - product.images.length
+  const atLimit = remaining <= 0
 
   const onDrop = useCallback(
     async (files: File[]) => {
+      // Only upload as many as fit under the cap; warn if some were dropped.
+      const allowed = files.slice(0, Math.max(0, remaining))
+      if (allowed.length === 0) {
+        toast.error(t('images.atLimit', { max: maxImages }))
+        return
+      }
+      if (allowed.length < files.length) {
+        toast.warning(t('images.limitTrimmed', { added: allowed.length, max: maxImages }))
+      }
+
       setUploading(true)
       try {
         const readyFiles = await Promise.all(
-          files.map((file) => processImage(file, { square: product.square_images })),
+          allowed.map((file) => processImage(file, { square: product.square_images })),
         )
         if (readyFiles.length === 0) return
 
@@ -32,12 +50,13 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
         setUploading(false)
       }
     },
-    [userId, catalogId, product.id, product.images, product.square_images, onChange],
+    [userId, catalogId, product.id, product.images, product.square_images, onChange, remaining, maxImages, t],
   )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/*': [] },
+    disabled: atLimit,
   })
 
   async function removeImage(storagePath: string) {
@@ -68,13 +87,25 @@ export default function ImagesStep({ product, onChange, userId, catalogId }: Ste
 
       <div
         {...getRootProps()}
-        className={`cursor-pointer rounded-md border-2 border-dashed px-6 py-10 text-center transition ${
-          isDragActive ? 'border-accent bg-accent/10' : 'border-line'
+        className={`rounded-md border-2 border-dashed px-6 py-10 text-center transition ${
+          atLimit
+            ? 'cursor-not-allowed border-line opacity-60'
+            : `cursor-pointer ${isDragActive ? 'border-accent bg-accent/10' : 'border-line'}`
         }`}
       >
         <input {...getInputProps()} />
-        <p className="text-muted">{uploading ? t('images.uploading') : t('images.dropzone')}</p>
+        <p className="text-muted">
+          {atLimit
+            ? t('images.atLimit', { max: maxImages })
+            : uploading
+              ? t('images.uploading')
+              : t('images.dropzone')}
+        </p>
       </div>
+
+      {limitsEnabled && (
+        <p className="text-xs text-faint">{t('images.usage', { count: product.images.length, max: maxImages })}</p>
+      )}
 
       {product.images.length > 0 && (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
