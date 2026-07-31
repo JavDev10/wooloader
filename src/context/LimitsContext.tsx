@@ -5,6 +5,7 @@ type LimitsState = {
   enabled: boolean
   maxProducts: number
   maxCatalogs: number
+  maxImages: number
   productCount: number
   catalogCount: number
   loaded: boolean
@@ -24,6 +25,7 @@ const UNLIMITED: LimitsState = {
   enabled: false,
   maxProducts: Infinity,
   maxCatalogs: Infinity,
+  maxImages: Infinity,
   productCount: 0,
   catalogCount: 0,
   loaded: false,
@@ -46,6 +48,7 @@ export function LimitsProvider({ children }: { children: ReactNode }) {
             enabled: true,
             maxProducts: limits.maxProducts,
             maxCatalogs: limits.maxCatalogs,
+            maxImages: limits.maxImages,
             productCount,
             catalogCount,
             loaded: true,

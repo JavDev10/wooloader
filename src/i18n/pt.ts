@@ -183,6 +183,9 @@ export default {
     dropzone: 'Arraste as fotos aqui ou clique para escolher',
     primary: 'Principal',
     deleteImage: 'Excluir imagem',
+    usage: '{{count}} de {{max}} imagens.',
+    atLimit: 'Você atingiu o máximo de {{max}} imagens por produto.',
+    limitTrimmed: 'Foram adicionadas {{added}}: o máximo é {{max}} imagens por produto.',
   },
   review: {
     intro: 'Revise os dados antes de continuar. Você pode voltar a qualquer etapa para corrigir algo.',
