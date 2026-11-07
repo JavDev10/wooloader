@@ -16,7 +16,7 @@ export default {
     headline: 'Load your product catalog and export it to WooCommerce in minutes.',
     subtitle:
       'A simple visual interface to build products — simple or with variations, images and prices — and download a CSV ready for the native WooCommerce importer. Open source and self-hostable.',
-    tryDemo: 'Try the demo',
+    tryDemo: 'Try without an account',
     signIn: 'Sign in',
     viewOnGithub: 'View on GitHub',
     feature1Title: 'Products with variations',
@@ -49,6 +49,16 @@ export default {
     or: 'or',
     google: 'Continue with Google',
     googleError: 'Could not sign in with Google.',
+  },
+  authErrors: {
+    guestDisabled: "Trial sessions aren't enabled on this server. Sign in or create an account.",
+    captcha: "We couldn't verify you're not a robot. Reload the page and try again.",
+    rateLimit: 'Too many attempts in a row. Wait a few minutes and try again.',
+    invalidCredentials: 'Wrong email or password.',
+    emailNotConfirmed: 'Confirm your email with the link we sent you before signing in.',
+    userExists: 'An account with that email already exists. Sign in instead.',
+    weakPassword: 'That password is too weak. Use a longer one.',
+    signupDisabled: "Email sign-up isn't enabled on this server.",
   },
   header: {
     demoSession: 'Trial session',

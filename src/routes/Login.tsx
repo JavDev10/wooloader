@@ -7,6 +7,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
 import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { authErrorMessage } from '@/lib/authErrors'
 import { CAPTCHA_ENABLED, DEMO_MODE, GOOGLE_AUTH_ENABLED, GUEST_TTL_HOURS } from '@/lib/config'
 
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
@@ -52,8 +53,9 @@ export default function Login() {
         await signIn(email, password, captchaToken ?? undefined)
       }
       navigate('/app', { replace: true })
-    } catch {
-      setError(mode === 'signup' ? t('login.signupError') : t('login.signinError'))
+    } catch (err) {
+      console.error(err)
+      setError(authErrorMessage(err, mode === 'signup' ? 'login.signupError' : 'login.signinError', t))
       resetCaptcha()
     } finally {
       setLoading(false)
@@ -66,8 +68,9 @@ export default function Login() {
     try {
       // Redirects away to Google; on success the browser lands on /auth/callback.
       await signInWithGoogle()
-    } catch {
-      setError(t('login.googleError'))
+    } catch (err) {
+      console.error(err)
+      setError(authErrorMessage(err, 'login.googleError', t))
       setLoading(false)
     }
   }
@@ -78,8 +81,9 @@ export default function Login() {
     try {
       await signInAnonymously(captchaToken ?? undefined)
       navigate('/app', { replace: true })
-    } catch {
-      setError(t('login.demoError'))
+    } catch (err) {
+      console.error(err)
+      setError(authErrorMessage(err, 'login.demoError', t))
       resetCaptcha()
       setLoading(false)
     }
