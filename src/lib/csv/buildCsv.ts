@@ -1,6 +1,7 @@
 import Papa from 'papaparse'
 import type { Product, WeightUnit } from '@/lib/types'
 import { mapProductToRows } from '@/lib/csv/mapProductToRows'
+import { currencyDecimals } from '@/lib/currency'
 import type { CsvRow } from '@/lib/csv/types'
 
 const BASE_COLUMNS: (keyof Omit<CsvRow, 'attributes'>)[] = [
@@ -50,13 +51,18 @@ export function escapeCsvValue(value: string): string {
  * product in the export so every row lines up under the same header run
  * (Attribute 1 name/value(s)/visible/global, Attribute 2 ..., etc).
  * `weightUnit` (the catalog's) only changes the Weight column header — values
- * are exported as entered.
+ * are exported as entered. `currency` (the catalog's) rounds prices to its
+ * decimals; WooCommerce doesn't take a currency per product, the store has one.
  */
-export function buildCsv(products: Product[], options: { weightUnit?: WeightUnit } = {}): string {
+export function buildCsv(
+  products: Product[],
+  options: { weightUnit?: WeightUnit; currency?: string } = {},
+): string {
   const weightHeader = WEIGHT_HEADER[options.weightUnit ?? 'kg']
   const headerFor = (col: (typeof BASE_COLUMNS)[number]) => (col === 'Weight' ? weightHeader : col)
+  const priceDecimals = options.currency ? currencyDecimals(options.currency) : undefined
 
-  const rows = products.flatMap(mapProductToRows)
+  const rows = products.flatMap((product) => mapProductToRows(product, { priceDecimals }))
   const maxAttributes = rows.reduce((max, row) => Math.max(max, row.attributes.length), 0)
 
   const attributeColumns: string[] = []

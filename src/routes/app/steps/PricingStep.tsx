@@ -3,7 +3,7 @@ import { Field, inputClass } from '@/components/ui/Field'
 import { PriceInput } from '@/components/ui/PriceInput'
 import type { StepProps } from '@/routes/app/steps/types'
 
-export default function PricingStep({ product, onChange }: StepProps) {
+export default function PricingStep({ product, onChange, currency }: StepProps) {
   const { t } = useTranslation()
   const isUnlimitedStock = product.stock === null
 
@@ -27,13 +27,24 @@ export default function PricingStep({ product, onChange }: StepProps) {
             <p className="rounded-md bg-link/10 px-3 py-2 text-sm text-muted">{t('pricing.variantsNote')}</p>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={t('pricing.regularPrice')} htmlFor="regular_price">
-              <PriceInput id="regular_price" value={product.regular_price} onChange={(v) => onChange({ regular_price: v })} />
+            <Field label={t('pricing.regularPrice', { currency })} htmlFor="regular_price">
+              <PriceInput
+                id="regular_price"
+                currency={currency}
+                value={product.regular_price}
+                onChange={(v) => onChange({ regular_price: v })}
+              />
             </Field>
-            <Field label={t('pricing.salePrice')} htmlFor="sale_price">
-              <PriceInput id="sale_price" value={product.sale_price} onChange={(v) => onChange({ sale_price: v })} />
+            <Field label={t('pricing.salePrice', { currency })} htmlFor="sale_price">
+              <PriceInput
+                id="sale_price"
+                currency={currency}
+                value={product.sale_price}
+                onChange={(v) => onChange({ sale_price: v })}
+              />
             </Field>
           </div>
+          <p className="text-xs text-faint">{t('pricing.currencyHint', { currency })}</p>
         </>
       )}
 

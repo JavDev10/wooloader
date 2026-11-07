@@ -25,6 +25,12 @@ describe('productSchema — Postgres numeric columns returned as strings', () =>
     expect(parsed.sale_price).toBe(2990)
   })
 
+  it('parses decimal prices sent as strings', () => {
+    const parsed = productSchema.parse({ ...rowWithStringNumerics(), regular_price: '19.99', sale_price: '0' })
+    expect(parsed.regular_price).toBe(19.99)
+    expect(parsed.sale_price).toBe(0)
+  })
+
   it('parses weight and stock sent as strings', () => {
     const parsed = productSchema.parse(rowWithStringNumerics())
     expect(parsed.weight).toBe(14.4)

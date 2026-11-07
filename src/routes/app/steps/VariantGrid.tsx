@@ -10,7 +10,7 @@ import { processImage } from '@/lib/imageValidation'
 import type { Variant } from '@/lib/types'
 import type { StepProps } from '@/routes/app/steps/types'
 
-export default function VariantGrid({ product, onChange, userId, catalogId, weightUnit }: StepProps) {
+export default function VariantGrid({ product, onChange, userId, catalogId, weightUnit, currency }: StepProps) {
   const { t } = useTranslation()
 
   function updateVariant(id: string, patch: Partial<Variant>) {
@@ -80,8 +80,8 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
         <thead>
           <tr className="text-left text-faint">
             <th className="px-2 font-normal">{t('variants.combination')}</th>
-            <th className="px-2 font-normal">{t('variants.price')}</th>
-            <th className="px-2 font-normal">{t('variants.sale')}</th>
+            <th className="px-2 font-normal">{t('variants.price', { currency })}</th>
+            <th className="px-2 font-normal">{t('variants.sale', { currency })}</th>
             <th className="px-2 font-normal">{t('variants.stock')}</th>
             <th className="px-2 font-normal">{t('variants.sku')}</th>
             <th className="px-2 font-normal">{t('variants.weight', { unit: weightUnit })}</th>
@@ -95,6 +95,7 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
             <VariantRow
               key={variant.id}
               variant={variant}
+              currency={currency}
               onChange={(patch) => updateVariant(variant.id, patch)}
               onUploadImage={(file) => handleImageUpload(variant.id, file)}
               onDelete={() => deleteVariant(variant.id)}
@@ -121,11 +122,13 @@ export default function VariantGrid({ product, onChange, userId, catalogId, weig
 
 function VariantRow({
   variant,
+  currency,
   onChange,
   onUploadImage,
   onDelete,
 }: {
   variant: Variant
+  currency: string
   onChange: (patch: Partial<Variant>) => void
   onUploadImage: (file: File) => void
   onDelete: () => void
@@ -141,10 +144,20 @@ function VariantRow({
           .join(' · ')}
       </td>
       <td className="px-2">
-        <PriceInput className={`${inputClass} w-24`} value={variant.price} onChange={(v) => onChange({ price: v })} />
+        <PriceInput
+          className={`${inputClass} w-24`}
+          currency={currency}
+          value={variant.price}
+          onChange={(v) => onChange({ price: v })}
+        />
       </td>
       <td className="px-2">
-        <PriceInput className={`${inputClass} w-24`} value={variant.sale_price} onChange={(v) => onChange({ sale_price: v })} />
+        <PriceInput
+          className={`${inputClass} w-24`}
+          currency={currency}
+          value={variant.sale_price}
+          onChange={(v) => onChange({ sale_price: v })}
+        />
       </td>
       <td className="px-2">
         <input

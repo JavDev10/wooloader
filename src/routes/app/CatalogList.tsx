@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { FolderPlus, Trash2 } from 'lucide-react'
 import { createCatalog, deleteCatalogCompletely, listCatalogs } from '@/lib/api/catalogs'
+import { guessCurrency } from '@/lib/currency'
 import { ConfirmButton } from '@/components/ui/ConfirmButton'
 import { inputClass } from '@/components/ui/Field'
 import { useLimits } from '@/context/LimitsContext'
@@ -30,7 +31,7 @@ export default function CatalogList() {
     const name = newName.trim() || t('catalogs.unnamed')
     setCreating(true)
     try {
-      const catalog = await createCatalog(name)
+      const catalog = await createCatalog(name, guessCurrency())
       bumpCatalogs(1)
       navigate(`/app/catalog/${catalog.id}`)
     } catch {

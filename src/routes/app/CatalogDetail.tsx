@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Copy, Download, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useLoadedProducts } from '@/hooks/useLoadedProducts'
 import { useEditorStore } from '@/store/editorStore'
-import { getCatalog, renameCatalog } from '@/lib/api/catalogs'
+import { getCatalog, renameCatalog, setCatalogCurrency } from '@/lib/api/catalogs'
+import { CURRENCIES, currencyName, DEFAULT_CURRENCY } from '@/lib/currency'
 import { deleteProduct } from '@/lib/api/products'
 import { buildCsv, downloadCsv } from '@/lib/csv/buildCsv'
 import { inputClass } from '@/components/ui/Field'
@@ -14,7 +15,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import type { WeightUnit } from '@/lib/types'
 
 export default function CatalogDetail() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { catalogId } = useParams<{ catalogId: string }>()
   const navigate = useNavigate()
   const loading = useLoadedProducts(catalogId!)
@@ -27,6 +28,11 @@ export default function CatalogDetail() {
 
   const [catalogName, setCatalogName] = useState('')
   const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg')
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY)
+  // The listed currencies, plus the catalog's own if it isn't one of them.
+  const currencyOptions = CURRENCIES.some((c) => c.code === currency)
+    ? CURRENCIES.map((c) => c.code)
+    : [currency, ...CURRENCIES.map((c) => c.code)]
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const savedNameRef = useRef('')
@@ -39,6 +45,7 @@ export default function CatalogDetail() {
         .then((c) => {
           setCatalogName(c.name)
           setWeightUnit(c.weight_unit)
+          setCurrency(c.currency)
           savedNameRef.current = c.name
         })
         .catch(() => {})
@@ -96,8 +103,17 @@ export default function CatalogDetail() {
     await deleteProduct(productId)
   }
 
+  function handleCurrencyChange(code: string) {
+    const previous = currency
+    setCurrency(code)
+    setCatalogCurrency(catalogId!, code).catch(() => {
+      toast.error(t('catalog.currencyError'))
+      setCurrency(previous)
+    })
+  }
+
   function handleExport() {
-    const csv = buildCsv(products, { weightUnit })
+    const csv = buildCsv(products, { weightUnit, currency })
     const filename = `${(catalogName || 'catalogo').replace(/\s+/g, '-').toLowerCase()}-${t('catalog.exportFileSuffix')}.csv`
     downloadCsv(filename, csv)
   }
@@ -150,6 +166,25 @@ export default function CatalogDetail() {
           {t('catalog.usage', { count: productCount, max: maxProducts })}
         </p>
       )}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <label htmlFor="catalog-currency" className="text-muted">
+          {t('catalog.currencyLabel')}
+        </label>
+        <select
+          id="catalog-currency"
+          value={currency}
+          onChange={(e) => handleCurrencyChange(e.target.value)}
+          className="rounded-md border border-line bg-surface px-2 py-1 outline-none focus:border-link"
+        >
+          {currencyOptions.map((code) => (
+            <option key={code} value={code}>
+              {code} — {currencyName(code, i18n.language)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p className="mt-1 text-xs text-faint">{t('catalog.currencyHint')}</p>
 
       <div className="mt-8 space-y-2">
         {products.map((product) => (

@@ -7,16 +7,17 @@ import { z } from 'zod'
  */
 
 /**
- * Prices are currently modeled as whole integers (no decimals, no thousands
- * separator in the stored value — see src/lib/priceFormat.ts, which feeds this
- * from the UI). This works for zero-decimal currencies (CLP, JPY, …); adding
- * proper multi-currency / decimal support is a planned generalization (see
- * PLAN.md). Uses z.coerce because Postgres `numeric` columns (weight,
- * regular_price, sale_price, stock) come back from Supabase/PostgREST as JSON
- * strings, not numbers, to avoid precision loss — a plain z.number() would
- * silently fail to parse a real, correctly saved price.
+ * Prices are plain numbers that may have decimals (19.99) — how many depends on
+ * the catalog's currency, which src/lib/priceFormat.ts enforces at input time.
+ * Not restricted here on purpose: a catalog can switch currency (USD → CLP)
+ * without converting values, and a stricter schema would then fail to load
+ * those products. Zero is allowed (WooCommerce accepts free products).
+ * Uses z.coerce because Postgres `numeric` columns (weight, regular_price,
+ * sale_price, stock) come back from Supabase/PostgREST as JSON strings, not
+ * numbers, to avoid precision loss — a plain z.number() would silently fail to
+ * parse a real, correctly saved price.
  */
-const priceSchema = z.coerce.number().int().positive()
+const priceSchema = z.coerce.number().nonnegative()
 
 export const dimensionsSchema = z.object({
   length: z.number().positive().nullable(),
@@ -118,6 +119,9 @@ export const catalogSchema = z.object({
   name: z.string(),
   // `.default('kg')` so rows saved before migration 0007 still parse.
   weight_unit: weightUnitSchema.default('kg'),
+  // ISO 4217 code (see src/lib/currency.ts). `.default('CLP')` so rows saved
+  // before migration 0009 still parse.
+  currency: z.string().regex(/^[A-Z]{3}$/).default('CLP'),
   created_at: z.string(),
   updated_at: z.string(),
 })

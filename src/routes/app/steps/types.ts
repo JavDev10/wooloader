@@ -11,4 +11,6 @@ export type StepProps = {
   weightUnit: WeightUnit
   /** Persists a new weight unit on the catalog (values are not converted). */
   onWeightUnitChange: (unit: WeightUnit) => void
+  /** The catalog's ISO currency code — drives price decimals and formatting. */
+  currency: string
 }

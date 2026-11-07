@@ -23,10 +23,10 @@ export async function getCatalog(id: string): Promise<Catalog> {
   return catalogSchema.parse(data)
 }
 
-export async function createCatalog(name: string): Promise<Catalog> {
+export async function createCatalog(name: string, currency: string): Promise<Catalog> {
   const { data, error } = await supabase
     .from('catalogs')
-    .insert({ name })
+    .insert({ name, currency })
     .select('*')
     .single()
   if (error) throw error
@@ -41,6 +41,12 @@ export async function renameCatalog(id: string, name: string): Promise<void> {
 /** Sets the catalog's weight unit (labels + CSV header only — stored values are not converted). */
 export async function setCatalogWeightUnit(id: string, unit: WeightUnit): Promise<void> {
   const { error } = await supabase.from('catalogs').update({ weight_unit: unit }).eq('id', id)
+  if (error) throw error
+}
+
+/** Sets the catalog's currency (display + allowed decimals — stored prices are not converted). */
+export async function setCatalogCurrency(id: string, currency: string): Promise<void> {
+  const { error } = await supabase.from('catalogs').update({ currency }).eq('id', id)
   if (error) throw error
 }
 
