@@ -46,16 +46,43 @@ export async function signInWithGoogle(): Promise<void> {
 }
 
 /** Demo mode: visitors get a real (but anonymous) auth.uid(), so the same RLS isolates them. Requires "Allow anonymous sign-ins" enabled in the Supabase dashboard. */
-export async function signInAnonymously(captchaToken?: string): Promise<void> {
+export async function signInAnonymously(captchaToken?: string, via: GuestOrigin = 'demo'): Promise<void> {
   const { error } = await supabase.auth.signInAnonymously({
-    options: captchaToken ? { captchaToken } : undefined,
+    options: { captchaToken, data: { via } },
   })
   if (error) throw error
+}
+
+/**
+ * Why a guest exists: trying the demo, or a client who opened a developer's
+ * share link. Stored in user_metadata.via so the UI can tell them apart (a link
+ * client's work isn't deleted with the guest, so the demo warning doesn't apply).
+ */
+export type GuestOrigin = 'demo' | 'share_link'
+
+export function isShareLinkGuest(session: Session): boolean {
+  return Boolean(session.user.is_anonymous) && session.user.user_metadata?.via === 'share_link'
 }
 
 export async function signOut(): Promise<void> {
   const { error } = await supabase.auth.signOut()
   if (error) throw error
+}
+
+/**
+ * Like getSession, but confirms with the server that the user still exists.
+ * A guest deleted by the 24 h cleanup keeps a stale session in the browser;
+ * this signs it out locally so the caller can start a fresh guest session.
+ */
+export async function getValidatedSession(): Promise<Session | null> {
+  const session = await getSession()
+  if (!session) return null
+  const { error } = await supabase.auth.getUser()
+  if (error) {
+    await supabase.auth.signOut({ scope: 'local' })
+    return null
+  }
+  return session
 }
 
 export async function getSession(): Promise<Session | null> {

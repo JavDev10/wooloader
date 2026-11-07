@@ -153,3 +153,38 @@ export function createEmptyProduct(catalogId: string, localOrder: number): Produ
     updated_at: new Date().toISOString(),
   }
 }
+
+export const planSchema = z.enum(['free', 'developer'])
+export type Plan = z.infer<typeof planSchema>
+
+export const shareLinkStatusSchema = z.enum(['open', 'submitted', 'revoked'])
+
+export const shareLinkSchema = z.object({
+  id: z.string().uuid(),
+  catalog_id: z.string().uuid(),
+  token: z.string(),
+  label: z.string(),
+  max_products: z.number().int().positive(),
+  expires_at: z.string().nullable(),
+  status: shareLinkStatusSchema,
+  submitted_at: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+})
+export type ShareLink = z.infer<typeof shareLinkSchema>
+
+/** What a link's holder sees before signing in (RPC get_share_link). 'expired' = open but past its date. */
+export const publicShareLinkSchema = z.object({
+  catalog_name: z.string(),
+  label: z.string(),
+  status: z.enum(['open', 'submitted', 'revoked', 'expired']),
+  expires_at: z.string().nullable(),
+  max_products: z.number().int().positive(),
+})
+export type PublicShareLink = z.infer<typeof publicShareLinkSchema>
+
+/** The status a link effectively has right now: an open link past its date counts as expired. */
+export function effectiveLinkStatus(link: Pick<ShareLink, 'status' | 'expires_at'>, now = new Date()) {
+  if (link.status === 'open' && link.expires_at && new Date(link.expires_at) <= now) return 'expired' as const
+  return link.status
+}

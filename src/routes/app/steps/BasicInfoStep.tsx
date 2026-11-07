@@ -125,27 +125,29 @@ export default function BasicInfoStep({ product, onChange, weightUnit, onWeightU
                   onBlur={() => setWeightFocused(false)}
                   placeholder="0"
                 />
-                <div
-                  className="flex shrink-0 overflow-hidden rounded-md border border-line"
-                  role="group"
-                  aria-label={t('basic.weightUnitAria')}
-                >
-                  {WEIGHT_UNITS.map((unit) => (
-                    <button
-                      key={unit}
-                      type="button"
-                      onClick={() => onWeightUnitChange(unit)}
-                      className={
-                        unit === weightUnit
-                          ? 'bg-accent px-3 text-sm font-semibold text-on-accent'
-                          : 'bg-surface px-3 text-sm text-muted hover:bg-elevated'
-                      }
-                      aria-pressed={unit === weightUnit}
-                    >
-                      {unit}
-                    </button>
-                  ))}
-                </div>
+                {onWeightUnitChange && (
+                  <div
+                    className="flex shrink-0 overflow-hidden rounded-md border border-line"
+                    role="group"
+                    aria-label={t('basic.weightUnitAria')}
+                  >
+                    {WEIGHT_UNITS.map((unit) => (
+                      <button
+                        key={unit}
+                        type="button"
+                        onClick={() => onWeightUnitChange(unit)}
+                        className={
+                          unit === weightUnit
+                            ? 'bg-accent px-3 text-sm font-semibold text-on-accent'
+                            : 'bg-surface px-3 text-sm text-muted hover:bg-elevated'
+                        }
+                        aria-pressed={unit === weightUnit}
+                      >
+                        {unit}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </Field>
           </div>

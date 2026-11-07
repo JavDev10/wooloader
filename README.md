@@ -81,6 +81,37 @@ Every user, guest or registered, can also load a **sample catalog** from the cat
 products (simple, variable, quote-only) in their language and currency, so there's something to
 explore and export right away. It counts toward the per-user limits.
 
+### Client share links (Developer plan)
+
+A catalog's owner can send a client a link (`/c/<token>`) so the client adds products to that
+catalog themselves — **no account needed** (they enter as a guest, with the CAPTCHA). Each link has
+an optional label (who it's for), a product cap and an expiry date. The client's catalog page shows
+an **"I'm done"** button that closes the link; the owner sees each link's status and can close,
+reopen or create more. Everything is enforced in Postgres (migration `0011`): a client can only
+touch the products of the catalog they joined, only while their link is open, and never more than
+its cap. Client uploads are stored under the owner's folder, so the owner can delete them and the
+24 h guest cleanup never removes a client's work.
+
+Links need **Allow anonymous sign-ins** enabled in Supabase (even with `VITE_DEMO_MODE=false`),
+and on the hosted instance the cleanup function from the section above.
+
+**Plans.** With `limits_enabled = false` (self-host) everyone has every feature. On the hosted
+instance users are on the **Free** plan unless you give them **Developer** from the SQL editor (a
+payments integration can do this later):
+
+```sql
+insert into public.profiles (user_id, plan)
+values ('<user uuid from Authentication → Users>', 'developer')
+on conflict (user_id) do update set plan = excluded.plan;
+```
+
+Developer limits default to 300 products, 10 catalogs and links of up to 100 products:
+
+```sql
+update public.app_config
+set dev_max_products_per_user = 300, dev_max_catalogs_per_user = 10, max_products_per_link = 100;
+```
+
 ### Per-user limits (free tier)
 
 Limits are **per user, across all their catalogs** (a free tier for the hosted version) and apply

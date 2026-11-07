@@ -40,6 +40,8 @@ const robots = [
   '',
   '# The signed-in app area is private — nothing to index there.',
   'Disallow: /app',
+  // Client share links carry a secret token: keep them out of search results.
+  'Disallow: /c/',
   '',
   ...(siteUrl ? [`Sitemap: ${siteUrl}/sitemap.xml`, ''] : []),
 ].join('\n')

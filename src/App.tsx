@@ -5,6 +5,7 @@ import { ConfirmDialogHost } from '@/components/ui/ConfirmDialogHost'
 import Landing from '@/routes/Landing'
 import Login from '@/routes/Login'
 import AuthCallback from '@/routes/AuthCallback'
+import ShareLinkEntry from '@/routes/ShareLinkEntry'
 import NotFound from '@/routes/NotFound'
 import Terms from '@/routes/legal/Terms'
 import Privacy from '@/routes/legal/Privacy'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/c/:token" element={<ShareLinkEntry />} />
           <Route path="/terminos" element={<Terms />} />
           <Route path="/privacidad" element={<Privacy />} />
 

@@ -1,11 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { countUserCatalogs, countUserProducts, getLimits } from '@/lib/api/limits'
+import { getMyPlan } from '@/lib/api/shareLinks'
+import type { Plan } from '@/lib/types'
 
 type LimitsState = {
   enabled: boolean
+  /** Effective plan: always 'developer' when limits are off (self-host). */
+  plan: Plan
   maxProducts: number
   maxCatalogs: number
   maxImages: number
+  maxProductsPerLink: number
   productCount: number
   catalogCount: number
   loaded: boolean
@@ -21,17 +26,20 @@ type LimitsContextValue = LimitsState & {
 
 const LimitsContext = createContext<LimitsContextValue | null>(null)
 
+/** No limits, every feature: self-host, or app_config not readable yet. */
 const UNLIMITED: LimitsState = {
   enabled: false,
+  plan: 'developer',
   maxProducts: Infinity,
   maxCatalogs: Infinity,
   maxImages: Infinity,
+  maxProductsPerLink: 1000,
   productCount: 0,
   catalogCount: 0,
   loaded: false,
 }
 
-export function LimitsProvider({ children }: { children: ReactNode }) {
+export function LimitsProvider({ userId, children }: { userId: string; children: ReactNode }) {
   const [state, setState] = useState<LimitsState>(UNLIMITED)
 
   useEffect(() => {
@@ -42,13 +50,21 @@ export function LimitsProvider({ children }: { children: ReactNode }) {
           if (!cancelled) setState({ ...UNLIMITED, loaded: true })
           return
         }
-        const [productCount, catalogCount] = await Promise.all([countUserProducts(), countUserCatalogs()])
+        const [plan, productCount, catalogCount] = await Promise.all([
+          // Fail closed on the plan: if it can't be read, treat as free.
+          getMyPlan().catch(() => 'free' as const),
+          countUserProducts(userId),
+          countUserCatalogs(userId),
+        ])
+        const caps = limits[plan]
         if (!cancelled) {
           setState({
             enabled: true,
-            maxProducts: limits.maxProducts,
-            maxCatalogs: limits.maxCatalogs,
+            plan,
+            maxProducts: caps.maxProducts,
+            maxCatalogs: caps.maxCatalogs,
             maxImages: limits.maxImages,
+            maxProductsPerLink: limits.maxProductsPerLink,
             productCount,
             catalogCount,
             loaded: true,
@@ -62,7 +78,7 @@ export function LimitsProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [userId])
 
   const value: LimitsContextValue = {
     ...state,

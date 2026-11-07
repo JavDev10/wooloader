@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { FolderPlus, Sparkles, Trash2 } from 'lucide-react'
 import { createCatalog, deleteCatalogCompletely, listCatalogs } from '@/lib/api/catalogs'
 import { upsertProduct } from '@/lib/api/products'
+import { isShareLinkGuest } from '@/lib/api/auth'
 import { guessCurrency } from '@/lib/currency'
 import { buildSampleProducts, sampleCatalogName, SAMPLE_PRODUCT_COUNT } from '@/lib/sampleCatalog'
 import { ConfirmButton } from '@/components/ui/ConfirmButton'
@@ -17,7 +18,7 @@ import type { AppContext } from '@/routes/app/RequireAuth'
 export default function CatalogList() {
   const { t, i18n } = useTranslation()
   usePageTitle(t('seo.catalogs'))
-  const { userId } = useOutletContext<AppContext>()
+  const { userId, session } = useOutletContext<AppContext>()
   const navigate = useNavigate()
   const { enabled, maxCatalogs, catalogCount, atCatalogLimit, bumpCatalogs, maxProducts, productCount, bumpProducts } =
     useLimits()
@@ -79,6 +80,42 @@ export default function CatalogList() {
     }
   }
 
+  // A client who arrived through a share link only works on catalogs shared
+  // with them; creating their own (guest, deleted after 24 h) would confuse.
+  const linkGuest = isShareLinkGuest(session)
+  const owned = catalogs?.filter((c) => c.user_id === userId) ?? null
+  const shared = catalogs?.filter((c) => c.user_id !== userId) ?? []
+
+  const sharedSection = shared.length > 0 && (
+    <section className={linkGuest ? 'mt-8' : 'mt-12'}>
+      <h2 className="font-semibold">{t('catalogs.sharedTitle')}</h2>
+      <p className="mt-1 text-sm text-muted">{t('catalogs.sharedSubtitle')}</p>
+      <div className="mt-4 space-y-2">
+        {shared.map((catalog) => (
+          <button
+            key={catalog.id}
+            type="button"
+            onClick={() => navigate(`/app/catalog/${catalog.id}`)}
+            className="block w-full rounded-md border border-line bg-surface px-4 py-3 text-left font-medium transition-colors hover:bg-elevated"
+          >
+            {catalog.name}
+          </button>
+        ))}
+      </div>
+    </section>
+  )
+
+  if (linkGuest) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
+        <h1 className="font-display text-3xl font-bold">{t('catalogs.sharedTitle')}</h1>
+        {catalogs === null && <p className="mt-6 text-faint">{t('common.loading')}</p>}
+        {catalogs !== null && shared.length === 0 && <p className="mt-6 text-faint">{t('catalogs.sharedEmpty')}</p>}
+        {sharedSection}
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
       <h1 className="font-display text-3xl font-bold">{t('catalogs.title')}</h1>
@@ -124,9 +161,9 @@ export default function CatalogList() {
       )}
 
       <div className="mt-8 space-y-2">
-        {catalogs === null && <p className="text-faint">{t('common.loading')}</p>}
-        {catalogs?.length === 0 && <p className="text-faint">{t('catalogs.empty')}</p>}
-        {catalogs?.map((catalog) => (
+        {owned === null && <p className="text-faint">{t('common.loading')}</p>}
+        {owned?.length === 0 && <p className="text-faint">{t('catalogs.empty')}</p>}
+        {owned?.map((catalog) => (
           <div
             key={catalog.id}
             className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
@@ -149,6 +186,8 @@ export default function CatalogList() {
           </div>
         ))}
       </div>
+
+      {sharedSection}
     </div>
   )
 }

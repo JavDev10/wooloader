@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
-import { getSession, onAuthStateChange } from '@/lib/api/auth'
+import { getSession, isShareLinkGuest, onAuthStateChange } from '@/lib/api/auth'
 import { AppHeader } from '@/routes/app/AppHeader'
 import { AdSlot } from '@/components/ui/AdSlot'
 import { LimitsProvider } from '@/context/LimitsContext'
@@ -38,12 +38,14 @@ export default function RequireAuth() {
   return (
     <div className="min-h-screen">
       <AppHeader session={session} />
-      {session.user.is_anonymous && (
+      {/* Demo guests lose everything after the TTL; a link client doesn't (the
+          products belong to the developer's catalog), so no warning for them. */}
+      {session.user.is_anonymous && !isShareLinkGuest(session) && (
         <p className="border-b border-line bg-amber-400/10 px-4 py-2 text-center text-sm text-muted sm:px-6">
           {t('app.guestBanner', { hours: GUEST_TTL_HOURS })}
         </p>
       )}
-      <LimitsProvider>
+      <LimitsProvider userId={session.user.id}>
         {/* Side gutters host the ad slots on the hosted instance (≥ xl screens).
             With ads off the slots render nothing and this is just the content. */}
         <div className="mx-auto flex max-w-7xl justify-center gap-4 xl:px-4">
