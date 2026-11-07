@@ -72,7 +72,7 @@ export default function Terms() {
 
       <h2>7. Software de código abierto</h2>
       <p>
-        El código de WooLoader se distribuye bajo la licencia MIT en el{' '}
+        El código de WooLoader se distribuye bajo la licencia AGPL-3.0 en el{' '}
         <a href={REPO_URL}>repositorio del proyecto</a>. Estos términos aplican al uso de la versión
         online hospedada; el uso del código autohospedado se rige por su licencia.
       </p>

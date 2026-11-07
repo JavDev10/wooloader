@@ -10,6 +10,21 @@ architecture and roadmap.
 > **Status:** early development. Phase 1 (CSV export core) is done and tested. The UI, backend
 > and hosted demo are in progress.
 
+## Model
+
+WooLoader is **fully open source** under the [AGPL-3.0](LICENSE). Two ways to use it:
+
+- **Self-host (free, every feature):** run your own copy with your own Supabase project. With
+  `limits_enabled = false` (the default) there are no plans and no limits — client share links
+  included.
+- **Hosted at [wooloader.com](https://wooloader.com):** a **Free** plan (catalogs, products,
+  CSV export) and a **Developer** plan (client share links today; pushing straight to WooCommerce
+  later). The Developer plan is what keeps the hosted instance running.
+
+The AGPL means anyone may run, modify and host WooLoader, but if you offer a modified version
+as a network service you must publish your changes under the same license. Releases before the
+plans/share-links change were MIT and remain available under MIT.
+
 ## Stack
 
 Vite + React 19 + TypeScript · Tailwind CSS v4 · Supabase (Postgres + Storage + Auth) · Zustand ·

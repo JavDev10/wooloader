@@ -84,7 +84,7 @@ FormWoocommerce/
 ├─ README.md              # setup self-host + explicación demo
 ├─ PLAN.md                # este archivo
 ├─ .env.example           # VITE_SUPABASE_* + VITE_DEMO_MODE
-├─ LICENSE                # MIT (open source)
+├─ LICENSE                # AGPL-3.0 (open source; MIT until the plans/links release)
 ├─ src/
 │  ├─ lib/                # núcleo reutilizado (csv, validation, format, types)
 │  ├─ components/ui/       # componentes genéricos white-label
