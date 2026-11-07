@@ -29,12 +29,22 @@ export default function Landing() {
       <p className="mt-4 max-w-xl text-lg text-muted">{t('landing.subtitle')}</p>
 
       <div className="mt-8 flex flex-wrap gap-3">
+        {/* With guest access on, both doors are offered: trying it without an
+            account and signing in. Both land on /login, which has the two. */}
         <Link
           to="/login"
           className="rounded-md bg-accent px-5 py-3 font-semibold text-on-accent hover:opacity-90"
         >
           {DEMO_MODE ? t('landing.tryDemo') : t('landing.signIn')}
         </Link>
+        {DEMO_MODE && (
+          <Link
+            to="/login"
+            className="rounded-md border border-line px-5 py-3 font-medium text-fg hover:bg-elevated"
+          >
+            {t('landing.signIn')}
+          </Link>
+        )}
         <a
           href="https://github.com/JavDev10/wooloader"
           className="rounded-md border border-line px-5 py-3 font-medium text-fg hover:bg-elevated"

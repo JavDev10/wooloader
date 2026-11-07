@@ -16,7 +16,7 @@ export default {
     headline: 'Carregue seu catálogo de produtos e exporte para o WooCommerce em minutos.',
     subtitle:
       'Uma interface visual simples para montar produtos — simples ou com variações, imagens e preços — e baixar um CSV pronto para o importador nativo do WooCommerce. Código aberto e auto-hospedável.',
-    tryDemo: 'Testar a demo',
+    tryDemo: 'Testar sem conta',
     signIn: 'Entrar',
     viewOnGithub: 'Ver no GitHub',
     feature1Title: 'Produtos com variações',
@@ -49,6 +49,16 @@ export default {
     or: 'ou',
     google: 'Continuar com o Google',
     googleError: 'Não foi possível entrar com o Google.',
+  },
+  authErrors: {
+    guestDisabled: 'As sessões de teste não estão ativadas neste servidor. Entre ou crie uma conta.',
+    captcha: 'Não foi possível verificar que você não é um robô. Recarregue a página e tente de novo.',
+    rateLimit: 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.',
+    invalidCredentials: 'Email ou senha incorretos.',
+    emailNotConfirmed: 'Confirme seu email pelo link que enviamos antes de entrar.',
+    userExists: 'Já existe uma conta com esse email. Entre.',
+    weakPassword: 'A senha é muito fraca. Use uma mais longa.',
+    signupDisabled: 'O cadastro por email não está habilitado neste servidor.',
   },
   header: {
     demoSession: 'Sessão de teste',
