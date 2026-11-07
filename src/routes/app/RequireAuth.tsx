@@ -6,6 +6,7 @@ import { getSession, onAuthStateChange } from '@/lib/api/auth'
 import { AppHeader } from '@/routes/app/AppHeader'
 import { AdSlot } from '@/components/ui/AdSlot'
 import { LimitsProvider } from '@/context/LimitsContext'
+import { GUEST_TTL_HOURS } from '@/lib/config'
 
 export type AppContext = {
   session: Session
@@ -37,6 +38,11 @@ export default function RequireAuth() {
   return (
     <div className="min-h-screen">
       <AppHeader session={session} />
+      {session.user.is_anonymous && (
+        <p className="border-b border-line bg-amber-400/10 px-4 py-2 text-center text-sm text-muted sm:px-6">
+          {t('app.guestBanner', { hours: GUEST_TTL_HOURS })}
+        </p>
+      )}
       <LimitsProvider>
         {/* Side gutters host the ad slots on the hosted instance (≥ xl screens).
             With ads off the slots render nothing and this is just the content. */}

@@ -1,8 +1,10 @@
 /**
  * Build-time configuration (Vite inlines these).
  *
- * DEMO_MODE only controls the anonymous "try it" entry on the login page (and
- * the DEMO badge). It requires "Allow anonymous sign-ins" enabled in Supabase.
+ * DEMO_MODE adds a "Try without an account" button to the login page, next to
+ * the normal sign-in. Guests get a real anonymous auth.uid(); the hosted
+ * instance deletes them after GUEST_TTL_HOURS (Edge Function
+ * cleanup-anonymous-users). It requires "Allow anonymous sign-ins" in Supabase.
  *
  * TURNSTILE_SITE_KEY, when set, turns on the Cloudflare Turnstile CAPTCHA on the
  * login page. It must match the widget whose *secret* key is configured in
@@ -14,6 +16,12 @@
  * migration 0006).
  */
 export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
+
+/**
+ * How long guest data lives, shown to guests in the UI. Must match the cleanup
+ * function's CLEANUP_TTL_HOURS (default 24) — the function is what deletes it.
+ */
+export const GUEST_TTL_HOURS = 24
 
 export const TURNSTILE_SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? ''
 export const CAPTCHA_ENABLED = TURNSTILE_SITE_KEY !== ''
