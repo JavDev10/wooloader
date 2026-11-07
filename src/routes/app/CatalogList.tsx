@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
-import { FolderPlus, Trash2 } from 'lucide-react'
+import { FolderPlus, Sparkles, Trash2 } from 'lucide-react'
 import { createCatalog, deleteCatalogCompletely, listCatalogs } from '@/lib/api/catalogs'
+import { upsertProduct } from '@/lib/api/products'
 import { guessCurrency } from '@/lib/currency'
+import { buildSampleProducts, sampleCatalogName, SAMPLE_PRODUCT_COUNT } from '@/lib/sampleCatalog'
 import { ConfirmButton } from '@/components/ui/ConfirmButton'
 import { inputClass } from '@/components/ui/Field'
 import { useLimits } from '@/context/LimitsContext'
@@ -13,14 +15,16 @@ import type { Catalog } from '@/lib/types'
 import type { AppContext } from '@/routes/app/RequireAuth'
 
 export default function CatalogList() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   usePageTitle(t('seo.catalogs'))
   const { userId } = useOutletContext<AppContext>()
   const navigate = useNavigate()
-  const { enabled, maxCatalogs, catalogCount, atCatalogLimit, bumpCatalogs } = useLimits()
+  const { enabled, maxCatalogs, catalogCount, atCatalogLimit, bumpCatalogs, maxProducts, productCount, bumpProducts } =
+    useLimits()
   const [catalogs, setCatalogs] = useState<Catalog[] | null>(null)
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
+  const [loadingSample, setLoadingSample] = useState(false)
 
   useEffect(() => {
     listCatalogs().then(setCatalogs).catch(() => setCatalogs([]))
@@ -37,6 +41,30 @@ export default function CatalogList() {
     } catch {
       toast.error(t('catalogs.createError'))
       setCreating(false)
+    }
+  }
+
+  // The sample adds one catalog and SAMPLE_PRODUCT_COUNT products, so it needs
+  // room under both per-user limits (the DB triggers would reject it anyway).
+  const canLoadSample = !atCatalogLimit && (!enabled || maxProducts - productCount >= SAMPLE_PRODUCT_COUNT)
+
+  async function handleLoadSample() {
+    if (!canLoadSample) return
+    setLoadingSample(true)
+    try {
+      const currency = guessCurrency()
+      const catalog = await createCatalog(sampleCatalogName(i18n.language), currency)
+      bumpCatalogs(1)
+      // Sequential so a limit hit stops cleanly instead of racing.
+      for (const product of buildSampleProducts(catalog.id, i18n.language, currency)) {
+        await upsertProduct(product)
+        bumpProducts(1)
+      }
+      navigate(`/app/catalog/${catalog.id}`)
+    } catch {
+      toast.error(t('catalogs.sampleError'))
+      setLoadingSample(false)
+      listCatalogs().then(setCatalogs).catch(() => {})
     }
   }
 
@@ -81,6 +109,18 @@ export default function CatalogList() {
       </div>
       {atCatalogLimit && (
         <p className="mt-2 text-xs text-amber-400">{t('catalogs.atLimit', { max: maxCatalogs })}</p>
+      )}
+
+      <button
+        type="button"
+        onClick={handleLoadSample}
+        disabled={loadingSample || !canLoadSample}
+        className="mt-3 flex items-center gap-1.5 text-sm text-link hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
+      >
+        <Sparkles size={14} /> {loadingSample ? t('catalogs.sampleLoading') : t('catalogs.loadSample')}
+      </button>
+      {!canLoadSample && !atCatalogLimit && (
+        <p className="mt-1 text-xs text-faint">{t('catalogs.sampleNoRoom', { count: SAMPLE_PRODUCT_COUNT })}</p>
       )}
 
       <div className="mt-8 space-y-2">

@@ -8,7 +8,6 @@ import { signOut, updateDisplayName } from '@/lib/api/auth'
 import { inputClass } from '@/components/ui/Field'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { DEMO_MODE } from '@/lib/config'
 
 export function AppHeader({ session }: { session: Session }) {
   const { t } = useTranslation()
@@ -46,7 +45,7 @@ export function AppHeader({ session }: { session: Session }) {
       <Link to="/app" className="flex shrink-0 items-center gap-2 font-display text-lg font-bold">
         <PackagePlus size={20} className="text-accent-ink" />
         WooLoader
-        {DEMO_MODE && <span className="rounded bg-elevated px-1.5 py-0.5 text-[10px] font-medium text-muted">DEMO</span>}
+        {isAnon && <span className="rounded bg-elevated px-1.5 py-0.5 text-[10px] font-medium text-muted">DEMO</span>}
       </Link>
 
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">

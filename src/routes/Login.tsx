@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
 import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { CAPTCHA_ENABLED, DEMO_MODE, GOOGLE_AUTH_ENABLED } from '@/lib/config'
+import { CAPTCHA_ENABLED, DEMO_MODE, GOOGLE_AUTH_ENABLED, GUEST_TTL_HOURS } from '@/lib/config'
 
 const inputCls = 'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-link'
 
@@ -106,76 +106,68 @@ export default function Login() {
         <ThemeToggle />
       </div>
 
-      {DEMO_MODE ? (
-        // Demo instance: anonymous entry only. Email sign-in/up is deliberately
-        // absent — email signups are disabled server-side on the demo, and demo
-        // visitors shouldn't create real accounts.
-        <div className="w-full max-w-sm space-y-4 text-center motion-safe:animate-fade-up">
-          <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
-          <p className="text-muted">{t('login.demoIntro')}</p>
-          {CAPTCHA_ENABLED && (
-            <div className="flex justify-center">
-              <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />
-            </div>
-          )}
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <button
-            type="button"
-            onClick={handleDemo}
-            disabled={loading || needsCaptcha}
-            className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
-          >
-            {loading ? '…' : t('login.tryDemo')}
-          </button>
-          {acceptanceLine}
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 motion-safe:animate-fade-up">
+        <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
+        <p className="text-muted">{mode === 'signup' ? t('login.signupSubtitle') : t('login.signinSubtitle')}</p>
+
+        <div className="space-y-1">
+          <label htmlFor="email" className="text-sm text-muted">{t('login.email')}</label>
+          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 motion-safe:animate-fade-up">
-          <h1 className="font-display text-2xl font-bold text-accent-ink">WooLoader</h1>
-          <p className="text-muted">{mode === 'signup' ? t('login.signupSubtitle') : t('login.signinSubtitle')}</p>
 
-          <div className="space-y-1">
-            <label htmlFor="email" className="text-sm text-muted">{t('login.email')}</label>
-            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
+        <div className="space-y-1">
+          <label htmlFor="password" className="text-sm text-muted">{t('login.password')}</label>
+          <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
+        </div>
+
+        {CAPTCHA_ENABLED && <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />}
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading || needsCaptcha}
+          className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
+        >
+          {loading ? '…' : mode === 'signup' ? t('login.signupButton') : t('login.signinButton')}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
+          className="w-full text-center text-sm text-faint hover:text-fg"
+        >
+          {mode === 'signup' ? t('login.toSignin') : t('login.toSignup')}
+        </button>
+
+        {GOOGLE_AUTH_ENABLED && (
+          <>
+            <div className="flex items-center gap-3 text-xs text-faint">
+              <span className="h-px flex-1 bg-line" /> {t('login.or')} <span className="h-px flex-1 bg-line" />
+            </div>
+            <GoogleSignInButton onClick={handleGoogle} disabled={loading} />
+          </>
+        )}
+
+        {DEMO_MODE && (
+          // Guest entry for people who want to look around before signing
+          // up. Shares the CAPTCHA token with the email form — only one of
+          // the two actions consumes it.
+          <div className="space-y-2 rounded-md border border-dashed border-line p-3 text-center">
+            <button
+              type="button"
+              onClick={handleDemo}
+              disabled={loading || needsCaptcha}
+              className="w-full rounded-md border border-line px-4 py-2 font-medium transition hover:bg-elevated disabled:opacity-50"
+            >
+              {t('login.tryDemo')}
+            </button>
+            <p className="text-xs text-faint">{t('login.guestNote', { hours: GUEST_TTL_HOURS })}</p>
           </div>
+        )}
 
-          <div className="space-y-1">
-            <label htmlFor="password" className="text-sm text-muted">{t('login.password')}</label>
-            <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
-          </div>
-
-          {CAPTCHA_ENABLED && <Turnstile ref={turnstileRef} onToken={setCaptchaToken} />}
-
-          {error && <p className="text-sm text-red-400">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={loading || needsCaptcha}
-            className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent transition hover:opacity-90 disabled:opacity-50"
-          >
-            {loading ? '…' : mode === 'signup' ? t('login.signupButton') : t('login.signinButton')}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
-            className="w-full text-center text-sm text-faint hover:text-fg"
-          >
-            {mode === 'signup' ? t('login.toSignin') : t('login.toSignup')}
-          </button>
-
-          {GOOGLE_AUTH_ENABLED && (
-            <>
-              <div className="flex items-center gap-3 text-xs text-faint">
-                <span className="h-px flex-1 bg-line" /> {t('login.or')} <span className="h-px flex-1 bg-line" />
-              </div>
-              <GoogleSignInButton onClick={handleGoogle} disabled={loading} />
-            </>
-          )}
-
-          {acceptanceLine}
-        </form>
-      )}
+        {acceptanceLine}
+      </form>
     </div>
   )
 }

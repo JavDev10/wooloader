@@ -38,9 +38,33 @@ npm run dev
 
 ### Hosted demo mode
 
-`VITE_DEMO_MODE=true` shows an anonymous "try it" entry on the login page — enable **Allow
-anonymous sign-ins** in the Supabase dashboard (**Authentication → Providers**). Visitors get a
-real anonymous `auth.uid()`, so the same row-level security isolates them from each other.
+`VITE_DEMO_MODE=true` adds a **"Try without an account"** button to the login page, next to the
+normal sign-in — enable **Allow anonymous sign-ins** in the Supabase dashboard
+(**Authentication → Sign In / Providers**). Guests get a real anonymous `auth.uid()`, so the same
+row-level security isolates them from each other, and the app tells them their data is deleted
+after 24 h.
+
+That deletion is done by the `cleanup-anonymous-users` Edge Function, run every hour by `pg_cron`.
+It removes each expired guest's images through the Storage API (Storage files can't be deleted with
+SQL), then the user — their catalogs and products cascade. To set it up:
+
+1. Apply migration `0010_list_expired_anonymous_users.sql` (part of the normal migrations).
+2. Deploy the function and give it a secret (a long random string):
+
+   ```bash
+   supabase functions deploy cleanup-anonymous-users --no-verify-jwt
+   supabase secrets set CLEANUP_SECRET=<long random string>
+   ```
+
+3. Run [`supabase/hosted/schedule_anonymous_cleanup.sql`](supabase/hosted/schedule_anonymous_cleanup.sql)
+   in the SQL editor, with your project URL and the same secret filled in.
+
+Optional: `supabase secrets set CLEANUP_TTL_HOURS=48` changes how long guest data lives (also update
+`GUEST_TTL_HOURS` in `src/lib/config.ts`, which is what the UI shows).
+
+Every user, guest or registered, can also load a **sample catalog** from the catalogs page: three
+products (simple, variable, quote-only) in their language and currency, so there's something to
+explore and export right away. It counts toward the per-user limits.
 
 ### Per-user limits (free tier)
 

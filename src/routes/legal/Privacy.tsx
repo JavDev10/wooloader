@@ -35,7 +35,7 @@ export default function Privacy() {
         </li>
         <li>
           <strong>Sesiones de prueba anónimas:</strong> se crea un identificador de usuario anónimo, sin
-          email. Sus datos son temporales y pueden eliminarse en cualquier momento.
+          email. Sus datos son temporales y se borran automáticamente (ver sección 7).
         </li>
         <li>
           <strong>Datos técnicos:</strong> dirección IP y metadatos de las solicitudes, usados por
@@ -113,8 +113,8 @@ export default function Privacy() {
           cuenta por el contacto de abajo.
         </li>
         <li>
-          <strong>Sesiones anónimas:</strong> son temporales; sus datos pueden purgarse periódicamente
-          sin previo aviso.
+          <strong>Sesiones de prueba (sin cuenta):</strong> se eliminan automáticamente, junto con sus
+          catálogos, productos e imágenes, unas 24 horas después de iniciarse.
         </li>
       </ul>
 
