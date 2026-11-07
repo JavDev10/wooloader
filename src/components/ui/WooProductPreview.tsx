@@ -3,11 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ImageOff, Star } from 'lucide-react'
 import { richTextContentClass } from '@/components/ui/RichTextEditor'
 import { sanitizeHtml } from '@/lib/sanitizeHtml'
+import { formatMoney } from '@/lib/priceFormat'
 import type { Product, Variant } from '@/lib/types'
-
-function formatPrice(value: number): string {
-  return `$${value.toLocaleString('es-CL')}`
-}
 
 function getVariantPriceRange(variants: Variant[]): { min: number; max: number } | null {
   const prices = variants.map((v) => v.price).filter((p): p is number => p !== null)
@@ -19,17 +16,17 @@ function findMatchingVariant(variants: Variant[], selection: Record<string, stri
   return variants.find((v) => Object.entries(selection).every(([name, value]) => v.attribute_values[name] === value))
 }
 
-function renderPrice(price: number | null, salePrice: number | null): ReactNode {
+function renderPrice(price: number | null, salePrice: number | null, currency: string): ReactNode {
   if (price === null) return '—'
   if (salePrice) {
     return (
       <>
-        <span className="mr-2 text-base font-normal text-gray-400 line-through">{formatPrice(price)}</span>
-        {formatPrice(salePrice)}
+        <span className="mr-2 text-base font-normal text-gray-400 line-through">{formatMoney(price, currency)}</span>
+        {formatMoney(salePrice, currency)}
       </>
     )
   }
-  return formatPrice(price)
+  return formatMoney(price, currency)
 }
 
 /**
@@ -39,8 +36,9 @@ function renderPrice(price: number | null, salePrice: number | null): ReactNode 
  * strip, and for variable products lets you pick attribute values (like Color/Size
  * on a real product page) and updates the price/image to match that variant.
  */
-export function WooProductPreview({ product }: { product: Product }) {
+export function WooProductPreview({ product, currency }: { product: Product; currency: string }) {
   const { t } = useTranslation()
+  const formatPrice = (value: number) => formatMoney(value, currency)
   const hasVariants = product.attributes.length > 0
 
   const [selection, setSelection] = useState<Record<string, string>>(() =>
@@ -148,7 +146,7 @@ export function WooProductPreview({ product }: { product: Product }) {
                   ? priceRange.min === priceRange.max
                     ? formatPrice(priceRange.min)
                     : t('preview.from', { price: formatPrice(priceRange.min) })
-                  : renderPrice(price, salePrice)}
+                  : renderPrice(price, salePrice, currency)}
             </p>
 
             {product.short_description && (

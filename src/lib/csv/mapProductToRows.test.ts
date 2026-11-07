@@ -215,6 +215,16 @@ describe('buildCsv', () => {
     expect(lbHeader).toContain('Weight (lbs)')
     expect(lbHeader).not.toContain('Weight (kg)')
   })
+
+  it('exports decimal prices with a dot and no thousands separator', () => {
+    const csv = buildCsv([simpleProduct({ regular_price: 1234.5, sale_price: 999.99 })], { currency: 'USD' })
+    expect(csv).toContain(',1234.5,999.99,')
+  })
+
+  it('rounds prices to the catalog currency decimals', () => {
+    const csv = buildCsv([simpleProduct({ regular_price: 19.99, sale_price: null })], { currency: 'CLP' })
+    expect(csv).toContain(',20,,')
+  })
 })
 
 describe('escapeCsvValue — formula-injection guard', () => {

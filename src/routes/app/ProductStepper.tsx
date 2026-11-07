@@ -11,6 +11,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { getCatalog, setCatalogWeightUnit } from '@/lib/api/catalogs'
 import type { AppContext } from '@/routes/app/RequireAuth'
 import type { Product, WeightUnit } from '@/lib/types'
+import { DEFAULT_CURRENCY } from '@/lib/currency'
 import BasicInfoStep from '@/routes/app/steps/BasicInfoStep'
 import PricingStep from '@/routes/app/steps/PricingStep'
 import AttributesStep from '@/routes/app/steps/AttributesStep'
@@ -38,6 +39,7 @@ export default function ProductStepper() {
   const updateProduct = useEditorStore((s) => s.updateProduct)
   const [stepIndex, setStepIndex] = useState(0)
   const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg')
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY)
 
   const product = products.find((p) => p.id === productId)
   const status = useAutosave(product)
@@ -45,7 +47,13 @@ export default function ProductStepper() {
   usePageTitle(product?.name ? `${product.name} · WooLoader` : `${t('stepper.newProduct')} · WooLoader`)
 
   useEffect(() => {
-    if (catalogId) getCatalog(catalogId).then((c) => setWeightUnit(c.weight_unit)).catch(() => {})
+    if (catalogId)
+      getCatalog(catalogId)
+        .then((c) => {
+          setWeightUnit(c.weight_unit)
+          setCurrency(c.currency)
+        })
+        .catch(() => {})
   }, [catalogId])
 
   function handleWeightUnitChange(unit: WeightUnit) {
@@ -145,6 +153,7 @@ export default function ProductStepper() {
           catalogId={catalogId!}
           weightUnit={weightUnit}
           onWeightUnitChange={handleWeightUnitChange}
+          currency={currency}
         />
       </div>
 

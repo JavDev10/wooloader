@@ -1,4 +1,5 @@
 import type { Product } from '@/lib/types'
+import { formatPriceForCsv } from '@/lib/priceFormat'
 import { generateSku } from '@/lib/csv/generateSku'
 import type { CsvRow } from '@/lib/csv/types'
 
@@ -35,8 +36,13 @@ function buildCategories(product: Product): string {
   return `${product.category}, ${product.category} > ${product.subcategory}`
 }
 
-/** Maps one Product to its WooCommerce CSV row(s): a single `simple` row, or one `variable` parent row + one `variation` row per variant. */
-export function mapProductToRows(product: Product): CsvRow[] {
+/**
+ * Maps one Product to its WooCommerce CSV row(s): a single `simple` row, or one
+ * `variable` parent row + one `variation` row per variant. `priceDecimals` (the
+ * catalog currency's) rounds prices on export; omitted, they're written as stored.
+ */
+export function mapProductToRows(product: Product, options: { priceDecimals?: number } = {}): CsvRow[] {
+  const price = (value: number | null) => formatPriceForCsv(value, options.priceDecimals)
   const description = buildDescription(product)
   const { length, width, height } = dims(product)
   const images = product.images.map((img) => img.url).join(', ')
@@ -58,8 +64,8 @@ export function mapProductToRows(product: Product): CsvRow[] {
         'Visibility in catalog': 'visible',
         Description: description,
         'Short description': product.short_description,
-        'Regular price': product.is_quote_only ? '' : (product.regular_price ?? '').toString(),
-        'Sale price': product.is_quote_only ? '' : (product.sale_price ?? '').toString(),
+        'Regular price': product.is_quote_only ? '' : price(product.regular_price),
+        'Sale price': product.is_quote_only ? '' : price(product.sale_price),
         Categories: categories,
         Images: images,
         'In stock?': inStock ? '1' : '0',
@@ -138,8 +144,8 @@ export function mapProductToRows(product: Product): CsvRow[] {
       'Visibility in catalog': 'visible',
       Description: '',
       'Short description': '',
-      'Regular price': (variant.price ?? '').toString(),
-      'Sale price': (variant.sale_price ?? '').toString(),
+      'Regular price': price(variant.price),
+      'Sale price': price(variant.sale_price),
       Categories: '',
       Images: variant.image_url ?? '',
       'In stock?': variantInStock ? '1' : '0',

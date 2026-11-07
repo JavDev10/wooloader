@@ -1,41 +1,45 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { inputClass } from '@/components/ui/Field'
-import { formatPriceDisplay, parsePriceInput } from '@/lib/priceFormat'
+import { currencyDecimals } from '@/lib/currency'
+import { formatPriceDisplay, formatPriceEditable, parsePriceInput } from '@/lib/priceFormat'
 
 type PriceInputProps = {
   id?: string
   value: number | null
   onChange: (value: number | null) => void
+  /** The catalog's currency — decides the allowed decimals and the display format. */
+  currency: string
   className?: string
   placeholder?: string
 }
 
 /**
- * A price input. Shows plain digits while focused (so typing doesn't fight a
- * live thousands separator / cursor jump), and a "3.990"-style formatted value
- * once blurred. Whatever the user types — with dots, commas, or nothing — the
- * value that reaches `onChange` is always a clean integer with no separators.
+ * A price input. While focused it keeps exactly what the user types (so a
+ * half-typed "19," isn't wiped out and the cursor doesn't jump); once blurred
+ * it shows the formatted value ("3.990", "1,234.50"). Whatever the user types —
+ * either decimal convention, with or without thousands separators — `onChange`
+ * receives a plain number limited to the currency's decimals.
  */
-export function PriceInput({ id, value, onChange, className, placeholder = '0' }: PriceInputProps) {
+export function PriceInput({ id, value, onChange, currency, className, placeholder = '0' }: PriceInputProps) {
+  const decimals = currencyDecimals(currency)
   const [focused, setFocused] = useState(false)
-  const [rawText, setRawText] = useState(value === null ? '' : String(value))
-
-  useEffect(() => {
-    if (!focused) setRawText(value === null ? '' : String(value))
-  }, [value, focused])
+  const [text, setText] = useState('')
 
   return (
     <input
       id={id}
       type="text"
-      inputMode="numeric"
+      inputMode={decimals > 0 ? 'decimal' : 'numeric'}
       className={className ?? inputClass}
-      value={focused ? rawText : formatPriceDisplay(value)}
-      onFocus={() => setFocused(true)}
+      value={focused ? text : formatPriceDisplay(value, currency)}
+      onFocus={() => {
+        setText(formatPriceEditable(value, currency))
+        setFocused(true)
+      }}
       onChange={(e) => {
-        const parsed = parsePriceInput(e.target.value)
-        setRawText(parsed === null ? '' : String(parsed))
-        onChange(parsed)
+        const typed = e.target.value.replace(/[^\d.,]/g, '')
+        setText(typed)
+        onChange(parsePriceInput(typed, decimals))
       }}
       onBlur={() => setFocused(false)}
       placeholder={placeholder}

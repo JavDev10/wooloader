@@ -1,14 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { WooProductPreview } from '@/components/ui/WooProductPreview'
+import { formatMoney } from '@/lib/priceFormat'
 import type { StepProps } from '@/routes/app/steps/types'
 
-function formatPrice(value: number | null): string {
-  if (value === null) return '—'
-  return `$${value.toLocaleString('es-CL')}`
-}
-
-export default function ReviewStep({ product }: StepProps) {
+export default function ReviewStep({ product, currency }: StepProps) {
   const { t } = useTranslation()
+  const formatPrice = (value: number | null) => (value === null ? '—' : formatMoney(value, currency))
 
   return (
     <div className="space-y-4 text-sm">
@@ -16,7 +13,7 @@ export default function ReviewStep({ product }: StepProps) {
 
       <div className="space-y-2">
         <p className="text-xs text-faint">{t('review.previewNote')}</p>
-        <WooProductPreview product={product} />
+        <WooProductPreview product={product} currency={currency} />
       </div>
 
       <dl className="grid grid-cols-[110px_1fr] gap-x-2 gap-y-2 rounded-md border border-line p-4 sm:grid-cols-[140px_1fr]">
