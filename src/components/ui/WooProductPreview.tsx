@@ -79,16 +79,17 @@ export function WooProductPreview({ product, currency }: { product: Product; cur
 
   return (
     // Stays within the page container (no viewport breakout — that would overlap
-    // the side ad gutters). The card's internal layout is responsive.
-    <div className="w-full">
+    // the side ad gutters), centered with a readable max width. Like a real
+    // WooCommerce product page: gallery and summary in two equal columns.
+    <div className="mx-auto w-full max-w-4xl">
       <div className="rounded-lg bg-white p-5 text-gray-900 shadow-lg">
         <p className="mb-4 truncate text-xs text-gray-400">
           {breadcrumb} / {product.name || t('preview.productFallback')}
         </p>
 
-        <div className="flex flex-col gap-6 sm:flex-row">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
           {/* Gallery */}
-          <div className="w-full flex-shrink-0 sm:w-80">
+          <div className="w-full">
             <div className="relative aspect-square w-full overflow-hidden rounded-md bg-gray-100">
               {mainImageUrl ? (
                 <img src={mainImageUrl} alt="" className="h-full w-full object-cover" />
