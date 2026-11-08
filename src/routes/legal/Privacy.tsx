@@ -38,6 +38,13 @@ export default function Privacy() {
           email. Sus datos son temporales y se borran automáticamente (ver sección 7).
         </li>
         <li>
+          <strong>Links para clientes:</strong> si cargas productos a través de un link que te envió un
+          desarrollador, ese contenido queda en el catálogo de <strong>esa persona</strong>, que puede
+          verlo, editarlo, exportarlo y borrarlo. Tu sesión de invitado se borra automáticamente, pero
+          los productos que cargaste no: siguen en ese catálogo. Para eliminarlos, pídeselo a quien te
+          envió el link.
+        </li>
+        <li>
           <strong>Datos técnicos:</strong> dirección IP y metadatos de las solicitudes, usados por
           nuestros proveedores (hosting y backend) para operar el servicio, aplicar límites de uso y
           prevenir abuso.
@@ -48,7 +55,7 @@ export default function Privacy() {
       <ul>
         <li>Prestar el servicio: guardar tus catálogos, mostrártelos y generar tu CSV.</li>
         <li>Autenticarte y mantener tu sesión iniciada.</li>
-        <li>Aplicar los límites del plan gratuito y prevenir abuso (rate limiting, CAPTCHA).</li>
+        <li>Aplicar los límites de cada plan (Gratis y Desarrollador) y prevenir abuso (rate limiting, CAPTCHA).</li>
       </ul>
       <p>No usamos tus datos para publicidad personalizada ni los compartimos con fines comerciales.</p>
 

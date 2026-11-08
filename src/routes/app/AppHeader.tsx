@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { LogOut, Pencil, PackagePlus } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
-import { signOut, updateDisplayName } from '@/lib/api/auth'
+import { isShareLinkGuest, signOut, updateDisplayName } from '@/lib/api/auth'
 import { inputClass } from '@/components/ui/Field'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
@@ -12,6 +12,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 export function AppHeader({ session }: { session: Session }) {
   const { t } = useTranslation()
   const isAnon = session.user.is_anonymous ?? false
+  const linkGuest = isShareLinkGuest(session)
   const currentName = (session.user.user_metadata?.full_name as string | undefined) ?? ''
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(currentName)
@@ -45,7 +46,7 @@ export function AppHeader({ session }: { session: Session }) {
       <Link to="/app" className="flex shrink-0 items-center gap-2 font-display text-lg font-bold">
         <PackagePlus size={20} className="text-accent-ink" />
         WooLoader
-        {isAnon && <span className="rounded bg-elevated px-1.5 py-0.5 text-[10px] font-medium text-muted">DEMO</span>}
+        {isAnon && !linkGuest && <span className="rounded bg-elevated px-1.5 py-0.5 text-[10px] font-medium text-muted">DEMO</span>}
       </Link>
 
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">
@@ -54,7 +55,9 @@ export function AppHeader({ session }: { session: Session }) {
         {/* The name/email editor is desktop-only — on a phone it doesn't fit and
             it's a rarely-used affordance. */}
         {isAnon ? (
-          <span className="hidden text-sm text-faint sm:inline">{t('header.demoSession')}</span>
+          <span className="hidden text-sm text-faint sm:inline">
+            {linkGuest ? t('header.linkGuest') : t('header.demoSession')}
+          </span>
         ) : editing ? (
           <input
             autoFocus

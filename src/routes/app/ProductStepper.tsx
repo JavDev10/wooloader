@@ -8,7 +8,8 @@ import { useAutosave } from '@/hooks/useAutosave'
 import { useEditorStore } from '@/store/editorStore'
 import { useLimits } from '@/context/LimitsContext'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { getCatalog, setCatalogWeightUnit } from '@/lib/api/catalogs'
+import { setCatalogWeightUnit } from '@/lib/api/catalogs'
+import { useCatalogAccess } from '@/hooks/useCatalogAccess'
 import type { AppContext } from '@/routes/app/RequireAuth'
 import type { Product, WeightUnit } from '@/lib/types'
 import { DEFAULT_CURRENCY } from '@/lib/currency'
@@ -33,6 +34,9 @@ export default function ProductStepper() {
   const navigate = useNavigate()
   const loading = useLoadedProducts(catalogId!)
   const { atProductLimit, bumpProducts } = useLimits()
+  const { access } = useCatalogAccess(catalogId!, userId)
+  const ready = access.status === 'ready' ? access : null
+  const isOwner = ready?.role === 'owner'
 
   const products = useEditorStore((s) => s.products)
   const addProduct = useEditorStore((s) => s.addProduct)
@@ -47,14 +51,16 @@ export default function ProductStepper() {
   usePageTitle(product?.name ? `${product.name} · WooLoader` : `${t('stepper.newProduct')} · WooLoader`)
 
   useEffect(() => {
-    if (catalogId)
-      getCatalog(catalogId)
-        .then((c) => {
-          setWeightUnit(c.weight_unit)
-          setCurrency(c.currency)
-        })
-        .catch(() => {})
-  }, [catalogId])
+    if (!ready) return
+    setWeightUnit(ready.catalog.weight_unit)
+    setCurrency(ready.catalog.currency)
+  }, [ready])
+
+  // A client whose link is closed/expired can't save anything: back to the
+  // (read-only) catalog instead of an editor whose autosave would just fail.
+  useEffect(() => {
+    if (ready && !ready.editable) navigate(`/app/catalog/${catalogId}`, { replace: true })
+  }, [ready, catalogId, navigate])
 
   function handleWeightUnitChange(unit: WeightUnit) {
     setWeightUnit(unit)
@@ -65,19 +71,20 @@ export default function ProductStepper() {
   }
 
   useEffect(() => {
-    if (productId !== 'new' || loading) return
-    // Respect the per-user product limit even if someone lands on /product/new
-    // directly (e.g. a bookmarked URL).
-    if (atProductLimit) {
+    if (productId !== 'new' || loading || !ready) return
+    // Respect the limit even if someone lands on /product/new directly (e.g. a
+    // bookmarked URL): the owner's account quota, or a client's link cap.
+    const atLimit = isOwner ? atProductLimit : ready.link !== null && products.length >= ready.link.max_products
+    if (atLimit || !ready.editable) {
       navigate(`/app/catalog/${catalogId}`, { replace: true })
       return
     }
     const created = addProduct(catalogId!)
-    bumpProducts(1)
+    if (isOwner) bumpProducts(1)
     navigate(`/app/catalog/${catalogId}/product/${created.id}`, { replace: true })
-  }, [productId, loading, addProduct, catalogId, navigate, atProductLimit, bumpProducts])
+  }, [productId, loading, ready, isOwner, products.length, addProduct, catalogId, navigate, atProductLimit, bumpProducts])
 
-  if (loading || productId === 'new') {
+  if (loading || productId === 'new' || !ready) {
     return <div className="flex min-h-[60vh] items-center justify-center text-muted">{t('common.loading')}</div>
   }
 
@@ -149,10 +156,13 @@ export default function ProductStepper() {
         <StepComponent
           product={product}
           onChange={onChange}
-          userId={userId}
+          // Images go under the catalog OWNER's folder, also when a client
+          // uploads them (storage policies in migration 0011).
+          userId={ready.catalog.user_id}
           catalogId={catalogId!}
           weightUnit={weightUnit}
-          onWeightUnitChange={handleWeightUnitChange}
+          // Only the owner can change catalog settings.
+          onWeightUnitChange={isOwner ? handleWeightUnitChange : undefined}
           currency={currency}
         />
       </div>

@@ -15,7 +15,7 @@ export default function Terms() {
         WooLoader es una herramienta para armar catálogos de productos con una interfaz visual y
         exportarlos como un archivo CSV compatible con el importador nativo de WooCommerce. Existe en
         dos formas: como <strong>software de código abierto</strong> que cualquiera puede autohospedar
-        (ver el <a href={REPO_URL}>repositorio</a>), y como una <strong>versión online gratuita</strong>{' '}
+        (ver el <a href={REPO_URL}>repositorio</a>), y como una <strong>versión online</strong>{' '}
         hospedada por el autor del proyecto, a la que aplican estos términos.
       </p>
 
@@ -37,11 +37,22 @@ export default function Terms() {
         <li>Podés solicitar la eliminación de tu cuenta y sus datos en cualquier momento (ver contacto).</li>
       </ul>
 
-      <h2>4. Límites del servicio gratuito</h2>
+      <h2>4. Planes y límites</h2>
       <p>
-        La versión online es gratuita y tiene límites por cuenta (por ejemplo, cantidad máxima de
-        productos y catálogos) que pueden mostrarse en la propia aplicación y modificarse en cualquier
-        momento. El servicio puede incluir publicidad de terceros para ayudar a sostener los costos.
+        La versión online tiene un plan <strong>Gratis</strong> con límites por cuenta (por ejemplo,
+        cantidad máxima de productos, catálogos e imágenes) que se muestran en la propia aplicación y
+        pueden modificarse en cualquier momento. El servicio puede incluir publicidad de terceros para
+        ayudar a sostener los costos.
+      </p>
+      <p>
+        El plan <strong>Desarrollador</strong> agrega funciones como los links para clientes y límites
+        más amplios. Se activa a pedido; su precio y condiciones se acuerdan al activarlo. Quien
+        autohospeda WooLoader tiene todas las funciones sin costo, según la licencia del código.
+      </p>
+      <p>
+        Si compartes un catálogo mediante un link, eres responsable de a quién se lo envías y del
+        contenido que tus clientes carguen en él. Ese contenido queda en tu catálogo: puedes cerrar el
+        link en cualquier momento.
       </p>
 
       <h2>5. Tu contenido</h2>
@@ -72,7 +83,7 @@ export default function Terms() {
 
       <h2>7. Software de código abierto</h2>
       <p>
-        El código de WooLoader se distribuye bajo la licencia MIT en el{' '}
+        El código de WooLoader se distribuye bajo la licencia AGPL-3.0 en el{' '}
         <a href={REPO_URL}>repositorio del proyecto</a>. Estos términos aplican al uso de la versión
         online hospedada; el uso del código autohospedado se rige por su licencia.
       </p>
@@ -80,7 +91,7 @@ export default function Terms() {
       <h2>8. Disponibilidad y garantías</h2>
       <p>
         El servicio se ofrece <strong>"tal cual"</strong> y <strong>"según disponibilidad"</strong>,
-        sin garantías de ningún tipo. Es un proyecto personal gratuito: puede tener interrupciones,
+        sin garantías de ningún tipo. Es un proyecto personal: puede tener interrupciones,
         errores, pérdida de datos o discontinuarse. Hacé una copia de tus catálogos exportando el CSV
         con regularidad.
       </p>
