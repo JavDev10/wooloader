@@ -141,7 +141,7 @@ export default function CatalogDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
+    <div className="mx-auto max-w-6xl px-6 py-12 motion-safe:animate-fade-up">
       <button
         type="button"
         onClick={() => navigate('/app')}
@@ -150,154 +150,161 @@ export default function CatalogDetail() {
         <ArrowLeft size={16} /> {t('catalog.backToList')}
       </button>
 
-      {isOwner && editingName ? (
-        <input
-          autoFocus
-          className={`${inputClass} font-display text-2xl font-bold`}
-          value={nameDraft}
-          onChange={(e) => setNameDraft(e.target.value)}
-          onBlur={saveName}
-          onKeyDown={handleNameKeyDown}
-          placeholder={t('catalog.namePlaceholder')}
-        />
-      ) : isOwner ? (
-        <button
-          type="button"
-          onClick={() => {
-            setNameDraft(catalogName)
-            setEditingName(true)
-          }}
-          className="group flex w-full min-w-0 items-center gap-2 text-left"
-        >
-          <h1 className="min-w-0 break-words font-display text-3xl font-bold">
-            {catalogName || t('catalog.fallbackName')}
-          </h1>
-          <Pencil size={16} className="shrink-0 text-faint group-hover:text-muted" />
-        </button>
-      ) : (
-        <h1 className="min-w-0 break-words font-display text-3xl font-bold">
-          {catalogName || t('catalog.fallbackName')}
-        </h1>
-      )}
-
-      <p className="mt-2 text-muted">
-        {products.length === 0 ? t('catalog.empty') : t('catalog.productCount', { count: products.length })}
-      </p>
-      {isOwner && enabled && (
-        <p className="mt-1 text-sm text-faint">
-          {t('catalog.usage', { count: productCount, max: maxProducts })}
-        </p>
-      )}
-
-      {!isOwner && (
-        <ClientLinkBanner
-          catalogId={catalogId!}
-          link={link}
-          productCount={products.length}
-          onSubmitted={reloadAccess}
-        />
-      )}
-
-      {isOwner ? (
-        <>
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-            <label htmlFor="catalog-currency" className="text-muted">
-              {t('catalog.currencyLabel')}
-            </label>
-            <select
-              id="catalog-currency"
-              value={currency}
-              onChange={(e) => handleCurrencyChange(e.target.value)}
-              className="rounded-md border border-line bg-surface px-2 py-1 outline-none focus:border-link"
-            >
-              {currencyOptions.map((code) => (
-                <option key={code} value={code}>
-                  {code} — {currencyName(code, i18n.language)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <p className="mt-1 text-xs text-faint">{t('catalog.currencyHint')}</p>
-        </>
-      ) : (
-        <p className="mt-4 text-sm text-faint">
-          {t('catalog.currencyFixed', { currency: `${currency} — ${currencyName(currency, i18n.language)}` })}
-        </p>
-      )}
-
-      <div className="mt-8 space-y-2">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
-          >
+      {/* Two columns on wide screens: the products on the left, catalog
+          actions/settings on the right. Stacked on narrow ones. */}
+      <div className="grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div className="min-w-0">
+          {isOwner && editingName ? (
+            <input
+              autoFocus
+              className={`${inputClass} font-display text-2xl font-bold`}
+              value={nameDraft}
+              onChange={(e) => setNameDraft(e.target.value)}
+              onBlur={saveName}
+              onKeyDown={handleNameKeyDown}
+              placeholder={t('catalog.namePlaceholder')}
+            />
+          ) : isOwner ? (
             <button
               type="button"
-              onClick={() => navigate(`/app/catalog/${catalogId}/product/${product.id}`)}
-              disabled={!editable}
-              className="min-w-0 flex-1 text-left disabled:cursor-default"
+              onClick={() => {
+                setNameDraft(catalogName)
+                setEditingName(true)
+              }}
+              className="group flex w-full min-w-0 items-center gap-2 text-left"
             >
-              <span className="break-words font-medium">{product.name || t('catalog.unnamedProduct')}</span>
-              {product.category && <span className="ml-2 text-sm text-faint">{product.category}</span>}
+              <h1 className="min-w-0 break-words font-display text-3xl font-bold">
+                {catalogName || t('catalog.fallbackName')}
+              </h1>
+              <Pencil size={16} className="shrink-0 text-faint group-hover:text-muted" />
             </button>
-            {editable && (
-              <div className="flex items-center gap-3">
+          ) : (
+            <h1 className="min-w-0 break-words font-display text-3xl font-bold">
+              {catalogName || t('catalog.fallbackName')}
+            </h1>
+          )}
+
+          <p className="mt-2 text-muted">
+            {products.length === 0 ? t('catalog.empty') : t('catalog.productCount', { count: products.length })}
+          </p>
+          {isOwner && enabled && (
+            <p className="mt-1 text-sm text-faint">
+              {t('catalog.usage', { count: productCount, max: maxProducts })}
+            </p>
+          )}
+
+          {!isOwner && (
+            <ClientLinkBanner
+              catalogId={catalogId!}
+              link={link}
+              productCount={products.length}
+              onSubmitted={reloadAccess}
+            />
+          )}
+
+          <div className="mt-8 space-y-2">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
+              >
                 <button
                   type="button"
-                  onClick={() => handleDuplicate(product.id)}
-                  disabled={atLimit}
-                  className="text-faint hover:text-link disabled:opacity-30 disabled:hover:text-faint"
-                  aria-label={t('catalog.duplicate')}
+                  onClick={() => navigate(`/app/catalog/${catalogId}/product/${product.id}`)}
+                  disabled={!editable}
+                  className="min-w-0 flex-1 text-left disabled:cursor-default"
                 >
-                  <Copy size={16} />
+                  <span className="break-words font-medium">{product.name || t('catalog.unnamedProduct')}</span>
+                  {product.category && <span className="ml-2 text-sm text-faint">{product.category}</span>}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(product.id)}
-                  className="text-faint hover:text-red-400"
-                  aria-label={t('catalog.deleteProduct')}
-                >
-                  <Trash2 size={16} />
-                </button>
+                {editable && (
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicate(product.id)}
+                      disabled={atLimit}
+                      className="text-faint hover:text-link disabled:opacity-30 disabled:hover:text-faint"
+                      aria-label={t('catalog.duplicate')}
+                    >
+                      <Copy size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(product.id)}
+                      className="text-faint hover:text-red-400"
+                      aria-label={t('catalog.deleteProduct')}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
+
+          {editable && (
+            <button
+              type="button"
+              onClick={handleAddProduct}
+              disabled={atLimit}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-line px-4 py-3 text-muted hover:border-accent hover:text-accent-ink disabled:opacity-40 disabled:hover:border-line disabled:hover:text-muted"
+            >
+              <Plus size={18} /> {t('catalog.addProduct')}
+            </button>
+          )}
+
+          {editable && atLimit && (
+            <p className="mt-2 text-center text-xs text-amber-400">
+              {isOwner
+                ? t('catalog.atLimit', { max: maxProducts })
+                : t('clientLink.atLimit', { max: link?.max_products ?? 0 })}
+            </p>
+          )}
+
+        </div>
+
+        <aside className="space-y-6">
+          {isOwner && (
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={products.length === 0}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-accent px-4 py-3 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
+            >
+              <Download size={18} /> {t('catalog.exportCsv')}
+            </button>
+          )}
+
+          <section className="rounded-lg border border-line p-5">
+            {isOwner ? (
+              <>
+                <label htmlFor="catalog-currency" className="block text-sm font-semibold">
+                  {t('catalog.currencyLabel')}
+                </label>
+                <select
+                  id="catalog-currency"
+                  value={currency}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
+                  className={`${inputClass} mt-2`}
+                >
+                  {currencyOptions.map((code) => (
+                    <option key={code} value={code}>
+                      {code} — {currencyName(code, i18n.language)}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-faint">{t('catalog.currencyHint')}</p>
+              </>
+            ) : (
+              <p className="text-sm text-muted">
+                {t('catalog.currencyFixed', { currency: `${currency} — ${currencyName(currency, i18n.language)}` })}
+              </p>
+            )}
+          </section>
+
+          {isOwner && <ShareLinksPanel catalogId={catalogId!} />}
+        </aside>
       </div>
-
-      {editable && (
-        <button
-          type="button"
-          onClick={handleAddProduct}
-          disabled={atLimit}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-line px-4 py-3 text-muted hover:border-accent hover:text-accent-ink disabled:opacity-40 disabled:hover:border-line disabled:hover:text-muted"
-        >
-          <Plus size={18} /> {t('catalog.addProduct')}
-        </button>
-      )}
-
-      {editable && atLimit && (
-        <p className="mt-2 text-center text-xs text-amber-400">
-          {isOwner
-            ? t('catalog.atLimit', { max: maxProducts })
-            : t('clientLink.atLimit', { max: link?.max_products ?? 0 })}
-        </p>
-      )}
-
-      {isOwner && (
-        <>
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={products.length === 0}
-            className="mt-8 flex w-full items-center justify-center gap-2 rounded-md bg-accent px-4 py-3 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
-          >
-            <Download size={18} /> {t('catalog.exportCsv')}
-          </button>
-
-          <ShareLinksPanel catalogId={catalogId!} />
-        </>
-      )}
     </div>
   )
 }

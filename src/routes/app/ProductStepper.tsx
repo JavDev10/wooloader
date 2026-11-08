@@ -116,7 +116,7 @@ export default function ProductStepper() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
+    <div className="mx-auto max-w-5xl px-6 py-12 motion-safe:animate-fade-up">
       <button
         type="button"
         onClick={() => navigate(`/app/catalog/${catalogId}`)}

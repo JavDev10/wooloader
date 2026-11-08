@@ -15,6 +15,10 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import type { Catalog } from '@/lib/types'
 import type { AppContext } from '@/routes/app/RequireAuth'
 
+const GRID = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
+const CARD =
+  'flex min-h-28 flex-col rounded-lg border border-line bg-surface p-4 transition-colors hover:border-accent/60 hover:bg-elevated'
+
 export default function CatalogList() {
   const { t, i18n } = useTranslation()
   usePageTitle(t('seo.catalogs'))
@@ -86,19 +90,26 @@ export default function CatalogList() {
   const owned = catalogs?.filter((c) => c.user_id === userId) ?? null
   const shared = catalogs?.filter((c) => c.user_id !== userId) ?? []
 
+  const cardMeta = (catalog: Catalog) =>
+    t('catalogs.cardMeta', {
+      currency: catalog.currency,
+      date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' }).format(new Date(catalog.updated_at)),
+    })
+
   const sharedSection = shared.length > 0 && (
     <section className={linkGuest ? 'mt-8' : 'mt-12'}>
       <h2 className="font-semibold">{t('catalogs.sharedTitle')}</h2>
       <p className="mt-1 text-sm text-muted">{t('catalogs.sharedSubtitle')}</p>
-      <div className="mt-4 space-y-2">
+      <div className={`mt-4 ${GRID}`}>
         {shared.map((catalog) => (
           <button
             key={catalog.id}
             type="button"
             onClick={() => navigate(`/app/catalog/${catalog.id}`)}
-            className="block w-full rounded-md border border-line bg-surface px-4 py-3 text-left font-medium transition-colors hover:bg-elevated"
+            className={`${CARD} text-left`}
           >
-            {catalog.name}
+            <span className="break-words font-semibold">{catalog.name}</span>
+            <span className="mt-auto pt-3 text-xs text-faint">{cardMeta(catalog)}</span>
           </button>
         ))}
       </div>
@@ -107,7 +118,7 @@ export default function CatalogList() {
 
   if (linkGuest) {
     return (
-      <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
+      <div className="mx-auto max-w-5xl px-6 py-12 motion-safe:animate-fade-up">
         <h1 className="font-display text-3xl font-bold">{t('catalogs.sharedTitle')}</h1>
         {catalogs === null && <p className="mt-6 text-faint">{t('common.loading')}</p>}
         {catalogs !== null && shared.length === 0 && <p className="mt-6 text-faint">{t('catalogs.sharedEmpty')}</p>}
@@ -117,75 +128,85 @@ export default function CatalogList() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 motion-safe:animate-fade-up">
-      <h1 className="font-display text-3xl font-bold">{t('catalogs.title')}</h1>
-      <p className="mt-2 text-muted">{t('catalogs.subtitle')}</p>
-      {enabled && (
-        <p className="mt-1 text-sm text-faint">
-          {t('catalogs.usage', { count: catalogCount, max: maxCatalogs })}
-        </p>
-      )}
+    <div className="mx-auto max-w-5xl px-6 py-12 motion-safe:animate-fade-up">
+      {/* Header: intro on the left, "new catalog" on the right (stacked on narrow screens). */}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-xl">
+          <h1 className="font-display text-3xl font-bold">{t('catalogs.title')}</h1>
+          <p className="mt-2 text-muted">{t('catalogs.subtitle')}</p>
+          {enabled && (
+            <p className="mt-1 text-sm text-faint">
+              {t('catalogs.usage', { count: catalogCount, max: maxCatalogs })}
+            </p>
+          )}
+        </div>
 
-      <div className="mt-8 flex gap-2">
-        <input
-          className={inputClass}
-          placeholder={t('catalogs.newPlaceholder')}
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-          disabled={atCatalogLimit}
-        />
-        <button
-          type="button"
-          onClick={handleCreate}
-          disabled={creating || atCatalogLimit}
-          className="flex items-center gap-1 whitespace-nowrap rounded-md bg-accent px-4 py-2 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
-        >
-          <FolderPlus size={18} /> {t('catalogs.create')}
-        </button>
-      </div>
-      {atCatalogLimit && (
-        <p className="mt-2 text-xs text-amber-400">{t('catalogs.atLimit', { max: maxCatalogs })}</p>
-      )}
-
-      <button
-        type="button"
-        onClick={handleLoadSample}
-        disabled={loadingSample || !canLoadSample}
-        className="mt-3 flex items-center gap-1.5 text-sm text-link hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
-      >
-        <Sparkles size={14} /> {loadingSample ? t('catalogs.sampleLoading') : t('catalogs.loadSample')}
-      </button>
-      {!canLoadSample && !atCatalogLimit && (
-        <p className="mt-1 text-xs text-faint">{t('catalogs.sampleNoRoom', { count: SAMPLE_PRODUCT_COUNT })}</p>
-      )}
-
-      <div className="mt-8 space-y-2">
-        {owned === null && <p className="text-faint">{t('common.loading')}</p>}
-        {owned?.length === 0 && <p className="text-faint">{t('catalogs.empty')}</p>}
-        {owned?.map((catalog) => (
-          <div
-            key={catalog.id}
-            className="flex items-center justify-between rounded-md border border-line bg-surface px-4 py-3 transition-colors hover:bg-elevated"
-          >
+        <div className="w-full lg:max-w-md">
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              placeholder={t('catalogs.newPlaceholder')}
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+              disabled={atCatalogLimit}
+            />
             <button
               type="button"
-              onClick={() => navigate(`/app/catalog/${catalog.id}`)}
-              className="flex-1 text-left font-medium"
+              onClick={handleCreate}
+              disabled={creating || atCatalogLimit}
+              className="flex items-center gap-1 whitespace-nowrap rounded-md bg-accent px-4 py-2 font-semibold text-on-accent hover:opacity-90 disabled:opacity-40"
             >
-              {catalog.name}
+              <FolderPlus size={18} /> {t('catalogs.create')}
             </button>
-            <ConfirmButton
-              onConfirm={() => handleDelete(catalog)}
-              label=""
-              confirmLabel={t('catalogs.confirmDelete')}
-              icon={<Trash2 size={16} />}
-              className="text-faint hover:text-red-400"
-              confirmClassName="text-xs font-medium text-red-400"
-            />
           </div>
-        ))}
+          {atCatalogLimit && (
+            <p className="mt-2 text-xs text-amber-400">{t('catalogs.atLimit', { max: maxCatalogs })}</p>
+          )}
+
+          <button
+            type="button"
+            onClick={handleLoadSample}
+            disabled={loadingSample || !canLoadSample}
+            className="mt-3 flex items-center gap-1.5 text-sm text-link hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
+          >
+            <Sparkles size={14} /> {loadingSample ? t('catalogs.sampleLoading') : t('catalogs.loadSample')}
+          </button>
+          {!canLoadSample && !atCatalogLimit && (
+            <p className="mt-1 text-xs text-faint">{t('catalogs.sampleNoRoom', { count: SAMPLE_PRODUCT_COUNT })}</p>
+          )}
+        </div>
       </div>
+
+      {owned === null && <p className="mt-10 text-faint">{t('common.loading')}</p>}
+      {owned?.length === 0 && <p className="mt-10 text-faint">{t('catalogs.empty')}</p>}
+      {owned && owned.length > 0 && (
+        <div className={`mt-10 ${GRID}`}>
+          {owned.map((catalog) => (
+            <div key={catalog.id} className={`${CARD} relative`}>
+              {/* The whole card opens the catalog; the delete button sits on top. */}
+              <button
+                type="button"
+                onClick={() => navigate(`/app/catalog/${catalog.id}`)}
+                className="absolute inset-0 rounded-lg"
+                aria-label={catalog.name}
+              />
+              <span className="pointer-events-none break-words pr-8 font-semibold">{catalog.name}</span>
+              <span className="pointer-events-none mt-auto pt-3 text-xs text-faint">{cardMeta(catalog)}</span>
+              <div className="absolute right-3 top-3">
+                <ConfirmButton
+                  onConfirm={() => handleDelete(catalog)}
+                  label=""
+                  confirmLabel={t('catalogs.confirmDelete')}
+                  icon={<Trash2 size={16} />}
+                  className="text-faint hover:text-red-400"
+                  confirmClassName="text-xs font-medium text-red-400"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {sharedSection}
     </div>

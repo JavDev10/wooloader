@@ -46,9 +46,10 @@ export default function RequireAuth() {
         </p>
       )}
       <LimitsProvider userId={session.user.id}>
-        {/* Side gutters host the ad slots on the hosted instance (≥ xl screens).
-            With ads off the slots render nothing and this is just the content. */}
-        <div className="mx-auto flex max-w-7xl justify-center gap-4 xl:px-4">
+        {/* Side gutters host the ad slots on the hosted instance, only on ≥ 2xl
+            screens so they never squeeze the editor (the variant table needs
+            ~880px). With ads off the slots render nothing and this is just the content. */}
+        <div className="mx-auto flex max-w-[1440px] justify-center gap-4 2xl:px-4">
           <AdSlot position="left" />
           <main className="min-w-0 flex-1">
             <Outlet context={{ session, userId: session.user.id } satisfies AppContext} />
