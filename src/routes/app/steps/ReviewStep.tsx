@@ -12,11 +12,11 @@ export default function ReviewStep({ product, currency }: StepProps) {
       <p className="text-muted">{t('review.intro')}</p>
 
       <div className="space-y-2">
-        <p className="text-xs text-faint">{t('review.previewNote')}</p>
+        <p className="text-center text-xs text-faint">{t('review.previewNote')}</p>
         <WooProductPreview product={product} currency={currency} />
       </div>
 
-      <dl className="grid grid-cols-[110px_1fr] gap-x-2 gap-y-2 rounded-md border border-line p-4 sm:grid-cols-[140px_1fr]">
+      <dl className="mx-auto grid max-w-4xl grid-cols-[110px_1fr] gap-x-2 gap-y-2 rounded-md border border-line p-4 sm:grid-cols-[140px_1fr]">
         <dt className="text-faint">{t('review.name')}</dt>
         <dd>{product.name || '—'}</dd>
 

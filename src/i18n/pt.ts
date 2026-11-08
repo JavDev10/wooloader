@@ -85,6 +85,7 @@ export default {
     sharedTitle: 'Compartilhados com você',
     sharedSubtitle: 'Catálogos para os quais você foi convidado por link para cadastrar produtos.',
     sharedEmpty: 'Você ainda não tem catálogos compartilhados. Abra o link que enviaram para você.',
+    cardMeta: '{{currency}} · atualizado em {{date}}',
     unnamed: 'Catálogo sem nome',
     confirmDelete: 'Apagar?',
     createError: 'Não foi possível criar o catálogo.',

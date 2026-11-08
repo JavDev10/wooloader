@@ -85,6 +85,7 @@ export default {
     sharedTitle: 'Shared with you',
     sharedSubtitle: "Catalogs you've been invited to fill in through a link.",
     sharedEmpty: "You don't have any shared catalogs yet. Open the link you were sent.",
+    cardMeta: '{{currency}} · updated {{date}}',
     unnamed: 'Untitled catalog',
     confirmDelete: 'Delete?',
     createError: 'Could not create the catalog.',

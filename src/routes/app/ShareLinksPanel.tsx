@@ -57,7 +57,7 @@ export function ShareLinksPanel({ catalogId }: { catalogId: string }) {
 
   if (!isDeveloper) {
     return (
-      <section className="mt-10 rounded-lg border border-dashed border-line p-5">
+      <section className="rounded-lg border border-dashed border-line p-5">
         <h2 className="flex items-center gap-2 font-semibold">
           <Lock size={16} className="text-faint" /> {t('shareLinks.title')}
         </h2>
@@ -111,14 +111,14 @@ export function ShareLinksPanel({ catalogId }: { catalogId: string }) {
   }
 
   return (
-    <section className="mt-10 rounded-lg border border-line p-5">
+    <section className="rounded-lg border border-line p-5">
       <h2 className="flex items-center gap-2 font-semibold">
         <Link2 size={16} className="text-accent-ink" /> {t('shareLinks.title')}
       </h2>
       <p className="mt-1 text-sm text-muted">{t('shareLinks.intro')}</p>
 
-      <form onSubmit={handleCreate} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-end">
-        <label className="space-y-1 text-sm">
+      <form onSubmit={handleCreate} className="mt-4 space-y-3">
+        <label className="flex flex-col gap-1 text-sm">
           <span className="text-muted">{t('shareLinks.label')}</span>
           <input
             className={inputClass}
@@ -128,37 +128,39 @@ export function ShareLinksPanel({ catalogId }: { catalogId: string }) {
             maxLength={80}
           />
         </label>
-        <label className="space-y-1 text-sm">
-          <span className="text-muted">{t('shareLinks.maxProducts')}</span>
-          <input
-            type="number"
-            min={1}
-            max={maxProductsPerLink}
-            className={`${inputClass} sm:w-24`}
-            value={maxProducts}
-            onChange={(e) =>
-              setMaxProducts(Math.max(1, Math.min(maxProductsPerLink, Number(e.target.value) || 1)))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="text-muted">{t('shareLinks.expiry')}</span>
-          <select
-            className={`${inputClass} sm:w-36`}
-            value={expiryDays}
-            onChange={(e) => setExpiryDays(Number(e.target.value))}
-          >
-            {EXPIRY_OPTIONS.map((days) => (
-              <option key={days} value={days}>
-                {days > 0 ? t('shareLinks.expiryDays', { count: days }) : t('shareLinks.expiryNever')}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-muted">{t('shareLinks.maxProducts')}</span>
+            <input
+              type="number"
+              min={1}
+              max={maxProductsPerLink}
+              className={inputClass}
+              value={maxProducts}
+              onChange={(e) =>
+                setMaxProducts(Math.max(1, Math.min(maxProductsPerLink, Number(e.target.value) || 1)))
+              }
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-muted">{t('shareLinks.expiry')}</span>
+            <select
+              className={inputClass}
+              value={expiryDays}
+              onChange={(e) => setExpiryDays(Number(e.target.value))}
+            >
+              {EXPIRY_OPTIONS.map((days) => (
+                <option key={days} value={days}>
+                  {days > 0 ? t('shareLinks.expiryDays', { count: days }) : t('shareLinks.expiryNever')}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <button
           type="submit"
           disabled={creating}
-          className="rounded-md bg-accent px-4 py-2 font-semibold text-on-accent hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-md bg-accent px-4 py-2 font-semibold text-on-accent hover:opacity-90 disabled:opacity-50"
         >
           {creating ? '…' : t('shareLinks.create')}
         </button>
@@ -213,7 +215,7 @@ function LinkRow({
   ]
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-surface px-4 py-3">
+    <div className="space-y-2 rounded-md border border-line bg-surface px-4 py-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate font-medium">{link.label || t('shareLinks.noLabel')}</span>

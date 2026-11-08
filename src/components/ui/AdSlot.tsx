@@ -17,7 +17,7 @@ export function AdSlot({ position }: { position: 'left' | 'right' }) {
   if (!ADS_ENABLED) return null
 
   return (
-    <aside className="hidden w-40 shrink-0 xl:block" aria-label={t('common.ad')} data-position={position}>
+    <aside className="hidden w-40 shrink-0 2xl:block" aria-label={t('common.ad')} data-position={position}>
       <div className="sticky top-6 flex h-[600px] w-40 items-center justify-center rounded-md border border-dashed border-line text-xs text-faint">
         {t('common.ad')}
       </div>
